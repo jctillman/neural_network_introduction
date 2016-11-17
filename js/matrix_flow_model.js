@@ -1,13 +1,11 @@
 const util = require('./util.js');
 
-// Model creates an an object meant to have two main roles.
+// Model creates an an object with 
+//
 // 1.
 //
 // First, it can take as input some matrix or matrixes
 // and give as output some other matrix or matrixes.
-//
-// The tools meant to allow you to do this are beneath the
-// "r" sub-object in the model, which stands for "run"
 //
 // This corresponds with the USE of a machine learning model.
 //
@@ -66,70 +64,48 @@ class Model{
 
 	//***********************
 
-	_addElement(getValueFnc){
+	add(opsInstance){
 		this.id++;
-		this.store.push({
-			getValue: getValueFnc
-		});
+		this.store.push(opsInstance);
 		return this.id;
 	}
 
 	//***********************
-	given(dim){
-		return this._addElement(
-			(elId, valueAcc) => valueAcc(elId)
-		);
-	}
 
-	param(initMatrix){
-		var value = initMatrix
-		return this._addElement(
-			(elId, valueAcc) => value
-		);
-	}
 
-	add(a,b){
-		return this._addElement(
-			(elId, valueAcc) => valueAcc(a).add(valueAcc(b))
-		)
-	}
 
-	add_broadcast(a,b){
-		return this._addElement(
-			(elId, valueAcc) => {
-				return valueAcc(a).add_broadcast(valueAcc(b));
-			}
-		)
-	}
+	// add_broadcast(a,b){
+	// 	return this._addElement(
+	// 		(elId, valueAcc) => {
+	// 			return valueAcc(a).add_broadcast(valueAcc(b));
+	// 		}
+	// 	)
+	// }
 
-	sub(a,b){
-		return this._addElement(
-			(elId, valueAcc) => valueAcc(a).sub(valueAcc(b))
-		)
-	}
+	// sub(a,b){
+	// 	return this._addElement(
+	// 		(elId, valueAcc) => valueAcc(a).sub(valueAcc(b))
+	// 	)
+	// }
 
-	mult(a,b){
-		return this._addElement(
-			(elId, valueAcc) => valueAcc(a).mult(valueAcc(b))
-		)
-	}
 
-	pow(a,powr){
-		const pow = (x) => Math.pow(x,powr)
-		return this._addElement( 
-			(elId, valueAcc) => {
-				return valueAcc(elementId).piecewise(pow);
-			}
-		)
-	}
 
-	reduce_sum(){
-		return this._addElement( 
-			(elId, valueAcc) => {
-				return valueAcc(elementId).reduce((x,y) => x + y);
-			}
-		)
-	}
+	// pow(a,powr){
+	// 	const pow = (x) => Math.pow(x,powr)
+	// 	return this._addElement( 
+	// 		(elId, valueAcc) => {
+	// 			return valueAcc(elementId).piecewise(pow);
+	// 		}
+	// 	)
+	// }
+
+	// reduce_sum(){
+	// 	return this._addElement( 
+	// 		(elId, valueAcc) => {
+	// 			return valueAcc(elementId).reduce((x,y) => x + y);
+	// 		}
+	// 	)
+	// }
 }
 
 module.exports = Model;

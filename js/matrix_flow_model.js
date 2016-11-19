@@ -1,26 +1,9 @@
 const util = require('./util.js');
 
-// Model creates an an object with 
-//
-// 1.
-//
-// First, it can take as input some matrix or matrixes
-// and give as output some other matrix or matrixes.
-//
-// This corresponds with the USE of a machine learning model.
-//
-// 2.
-//
-// Second, it can take as input some matrix or matrixes
-// and a correct output matrix or matrixes, and alter its
-// internal parameters to approximate the input->output
-// mapping.
-//
-// The tools meant to allow you to do this are beneath the
-// "t" sub-object in the model, which stands for "train"
-//
-// Clearly, this corresponds to the training of an ML model.
-//
+// Model creates an an object with that
+// can take as input some matrix or matrixes
+// and give as output some other matrix
+// or matrixes.
 class Model{
 	
 	constructor(){
@@ -70,42 +53,6 @@ class Model{
 		return this.id;
 	}
 
-	//***********************
-
-
-
-	// add_broadcast(a,b){
-	// 	return this._addElement(
-	// 		(elId, valueAcc) => {
-	// 			return valueAcc(a).add_broadcast(valueAcc(b));
-	// 		}
-	// 	)
-	// }
-
-	// sub(a,b){
-	// 	return this._addElement(
-	// 		(elId, valueAcc) => valueAcc(a).sub(valueAcc(b))
-	// 	)
-	// }
-
-
-
-	// pow(a,powr){
-	// 	const pow = (x) => Math.pow(x,powr)
-	// 	return this._addElement( 
-	// 		(elId, valueAcc) => {
-	// 			return valueAcc(elementId).piecewise(pow);
-	// 		}
-	// 	)
-	// }
-
-	// reduce_sum(){
-	// 	return this._addElement( 
-	// 		(elId, valueAcc) => {
-	// 			return valueAcc(elementId).reduce((x,y) => x + y);
-	// 		}
-	// 	)
-	// }
 }
 
 module.exports = Model;

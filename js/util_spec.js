@@ -22,4 +22,12 @@ describe("Includes some basic functional utility elements", function(){
 		expect(f(arrTwo)).to.equal(4);
 	})
 
+	it('Has object map function', function(){
+		var obj = {a:1,b:2,c:3};
+		var mapped = util.objMap(obj, x => x * 2);
+		expect(mapped.a).to.equal(2)
+		expect(mapped.b).to.equal(4)
+		expect(mapped.c).to.equal(6)
+	});
+
 });

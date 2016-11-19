@@ -55,7 +55,7 @@ const ops = {
 	Reduce_sum: () => {
 		return { 
 			getValue: (elId, valueAcc) => {
-				return valueAcc(elementId).reduce((x,y) => x + y);
+				return valueAcc(elId).reduce((x,y) => x + y);
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 const expect = require("chai").expect;
 const mf = require('./matrix_flow.js');
-const o = mf.ops
+const o = mf.ops.lib;
 const util = require('./util.js');
 const la = require('./line_alge.js');
 const Matrix = la.Matrix;
@@ -65,9 +65,6 @@ describe('Can make and get basic output from models', function(){
 
 		results = mdl.run([out],[X,Y],[Xval, Yval]);
 
-
 	});
-
-
 
 })

@@ -1,44 +1,51 @@
 
-var err = (x) => {
+const err = (x) => {
 	throw new Error(x);}
 
-var isNumeric = (n) => {
+const isNumeric = (n) => {
     return Number(parseFloat(n))==n && isFinite(n);}
 
-var numericArray = (arr) => {
+const numericArray = (arr) => {
 	arr.forEach( (x) => {
 		isNumeric(x) || err("Array element required to be numeric.")
 	})
 	return arr;
 }
 
-var numericNum = (num) => {
+const numericNum = (num) => {
 	isNumeric(num) || err("Variable required to be numeric.");
 	return num
 }
 
-var zipWith = (arrOne, arrTwo, func) => {
+const zipWith = (arrOne, arrTwo, func) => {
 	(arrOne.length == arrTwo.length) || err("Arrays must be of same length.");
 	return numericArray(arrOne.map(function(_, i){
 		return func(arrOne[i], arrTwo[i]);
 	}));
 }
 
-var sum = (arr) => {
+const sum = (arr) => {
 	return numericNum(arr.reduce(function(total, indiv){
 		return total + indiv;
 	}, 0));
 }
 
-var ident = (x) => x
+const ident = (x) => x;
 
-var flatMap = (arr, fnc) => {
+const flatMap = (arr, fnc) => {
 	return arr.reduce( (total, cur) => {
 		return total.concat(cur);
 	}, [])
 }
 
-var normal = (stdev) => {
+const objMap = (obj, fnc) => {
+	return Object.keys(obj).reduce( (retObj, key) => {
+		retObj[key] = fnc(obj[key]);
+		return retObj;
+	}, {})
+}
+
+const normal = (stdev) => {
 	return () => {
 		var total = -6;
 		for(var x = 0; x < 12; x++){
@@ -49,4 +56,4 @@ var normal = (stdev) => {
 }
 
 module.exports = {numericNum, numericArray,
-	zipWith, sum, err, normal}
+	zipWith, sum, err, normal, objMap}

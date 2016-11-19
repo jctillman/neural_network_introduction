@@ -19,27 +19,6 @@ class Matrix {
 		}			
 	}
 
-	_check(otherMatr){
-		(otherMatr instanceof Matrix) || 
-			err("Matrix required.");}
-
-	_equalDims(otherMatr){
-		(otherMatr.mx.length == this.mx.length) &&
-		(otherMatr.mx[0].length == this.mx[0].length) ||
-			err("Matrices must be of equal size.");}
-
-	_isVector(otherMatr){
-		(otherMatr.mx[0].length == 1) ||
-			err("Matrix must be a vector, i.e., have only one column.");}
-
-	_multDims(otherMatr){
-		(this.mx[0].length == otherMatr.mx.length) ||
-			err("Colunms in first matrix must equal rows in second.");}
-
-	_isFnc(fnc){
-		(typeof fnc == 'function') ||
-			err("Variable must be function.");}
-
 	dims(){ return [ this.mx.length, this.mx[0].length] }
 	
 	row(num){ return this.mx[num];}
@@ -53,30 +32,30 @@ class Matrix {
 	}
 
 	add(otherMatr){
-		this._check(otherMatr);
-		this._equalDims(otherMatr);
+		Matrix.check(otherMatr);
+		Matrix.checkEqualDims(this, otherMatr);
 		return Matrix.make(this.dims(), (row,col) => {
 			return this.mx[row][col] + otherMatr.mx[row][col];
 		});
 	}
 
 	add_broadcast(otherMatr){
-		this._check(otherMatr);
-		this._isVector(otherMatr);
+		Matrix.check(otherMatr);
+		Matrix.isVector(otherMatr);
 		return Matrix.make( this.dims(), (row, col) => {
 			return this.mx[row][col] + otherMatr.mx[col][0]
 		});
 	}
 
 	piecewise(fnc){
-		this._isFnc(fnc);
+		Matrix.isFnc(fnc);
 		return Matrix.make( this.dims(), (row, col) => {
 			return fnc(this.mx[row][col]);
 		})
 	}
 
 	reduce(fnc, start){
-		this._isFnc(fnc);
+		Matrix.isFnc(fnc);
 		return new Matrix([[
 			flatMap(this.mx, util.ident).reduce( (total, element, rowIndex) => {
 				return fnc(total, element);
@@ -89,8 +68,8 @@ class Matrix {
 	}
 
 	mult(otherMatr){
-		this._check(otherMatr)
-		this._multDims(otherMatr);
+		Matrix.check(otherMatr)
+		Matrix.checkMultDims(this, otherMatr);
 		const newRow = this.mx.length;
 		const newCol = otherMatr.mx[0].length;
 		return Matrix.make([newRow, newCol], (row, col) => {
@@ -102,6 +81,7 @@ class Matrix {
 	}
 
 	static make(dimensions, generator){
+		Matrix.isFnc(generator)
 		var [rowNum, colNum] = dimensions;
 		var matrixContents = [];
 		for(var x = 0; x < rowNum; x++){
@@ -112,6 +92,27 @@ class Matrix {
 		}
 		return new Matrix(matrixContents)
 	}
+
+	static check(otherMatr){
+		(otherMatr instanceof Matrix) || 
+			err("Matrix required.");}
+
+	static checkEqualDims(thisMtr, otherMatr){
+		(otherMatr.mx.length == thisMtr.mx.length) &&
+		(otherMatr.mx[0].length == thisMtr.mx[0].length) ||
+			err("Matrices must be of equal size.");}
+
+	static isVector(otherMatr){
+		(otherMatr.mx[0].length == 1) ||
+			err("Matrix must be a vector, i.e., have only one column.");}
+
+	static checkMultDims(thisMtr, otherMatr){
+		(thisMtr.mx[0].length == otherMatr.mx.length) ||
+			err("Colunms in first matrix must equal rows in second.");}
+
+	static isFnc(fnc){
+		(typeof fnc == 'function') ||
+			err("Variable must be function.");}
 
 }
 

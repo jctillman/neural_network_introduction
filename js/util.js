@@ -55,5 +55,5 @@ const normal = (stdev) => {
 	}
 }
 
-module.exports = {numericNum, numericArray,
-	zipWith, sum, err, normal, objMap}
+module.exports = {numericNum, numericArray, flatMap,
+	zipWith, sum, err, normal, objMap, ident}

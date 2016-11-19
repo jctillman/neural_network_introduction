@@ -26,15 +26,19 @@ class Matrix {
 	_equalDims(otherMatr){
 		(otherMatr.mx.length == this.mx.length) &&
 		(otherMatr.mx[0].length == this.mx[0].length) ||
-			err("Matrices must be of equal size.")}
+			err("Matrices must be of equal size.");}
 
 	_isVector(otherMatr){
 		(otherMatr.mx[0].length == 1) ||
-			err("Matrix must be a vector, i.e., have only one column.")}
+			err("Matrix must be a vector, i.e., have only one column.");}
 
 	_multDims(otherMatr){
 		(this.mx[0].length == otherMatr.mx.length) ||
-			err("Colunms in first matrix must equal rows in second.")}
+			err("Colunms in first matrix must equal rows in second.");}
+
+	_isFnc(fnc){
+		(typeof fnc == 'function') ||
+			err("Variable must be function.");}
 
 	dims(){ return [ this.mx.length, this.mx[0].length] }
 	
@@ -57,7 +61,7 @@ class Matrix {
 	}
 
 	add_broadcast(otherMatr){
-		this._check(otherMatr)
+		this._check(otherMatr);
 		this._isVector(otherMatr);
 		return Matrix.make( this.dims(), (row, col) => {
 			return this.mx[row][col] + otherMatr.mx[col][0]
@@ -65,12 +69,14 @@ class Matrix {
 	}
 
 	piecewise(fnc){
+		this._isFnc(fnc);
 		return Matrix.make( this.dims(), (row, col) => {
 			return fnc(this.mx[row][col]);
 		})
 	}
 
 	reduce(fnc, start){
+		this._isFnc(fnc);
 		return new Matrix([[
 			flatMap(this.mx, util.ident).reduce( (total, element, rowIndex) => {
 				return fnc(total, element);

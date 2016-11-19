@@ -37,9 +37,7 @@ class Model{
 			}
 		}
 
-		//Finally, map over the ids that we're interested in,
-		//and get the values from them.  Recursion is handled
-		//inside of the get_values, with the store.
+		//Finally, recursively get the values from the ids we're interested in.
 		return idsToGet.map( id => {
 			return this.store[id].getValue(id, valueAcc);
 		});

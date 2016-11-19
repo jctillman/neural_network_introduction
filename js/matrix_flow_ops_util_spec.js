@@ -18,7 +18,7 @@ describe('Has a utility library for ops', function(){
 		var W = o.Param(Matrix.make([1,1], util.normal(0.1)));
 		var b = o.Param(Matrix.make([1,1], util.normal(0.1)));
 		var out = o.Mult(X,W);
-		var out = o.Add_broadcast(o.Mult(X,W), b);
+		var out = o.AddBroadcast(o.Mult(X,W), b);
 		var loss = o.ReduceSum(o.Pow(o.Sub(out, Y), 2));
 
 		var Xval = new Matrix([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]);

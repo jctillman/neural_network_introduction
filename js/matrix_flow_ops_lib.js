@@ -8,39 +8,45 @@ const ops = {
 		var value = initMatrix
 		return {
 			getParents: () => [],
-			getValue: (elemId, valAcc) => value
+			getValue: (elId, valAcc) => value
 		};
 	},
 
 	Given: () => {
 		return {
 			getParents: () => [],
-			getValue: (elemId, valAcc) => valAcc(elemId)
+			getValue: (elId, valAcc) => valAcc(elId)
 		};
 	},
 
 	Add: (a,b) => {
 		return {
 			getParents: () => [a,b],
-			getValue: (elId, valueAcc) => valueAcc(a).add(valueAcc(b))	
+			getValue: (elId, valueAcc) => {
+				return valueAcc(a).add(valueAcc(b))	
+			}
 		}
 	},
 
 	Sub: (a,b) => {
 		return {
 			getParents: () => [a,b],
-			getValue: (elId, valueAcc) => valueAcc(a).sub(valueAcc(b))
+			getValue: (elId, valueAcc) => {
+				return valueAcc(a).sub(valueAcc(b))
+			}
 		}
 	},
 
 	Mult: (a,b) => {
 		return {
 			getParents: () => [a,b],
-			getValue: (elId, valueAcc) => valueAcc(a).mult(valueAcc(b))
+			getValue: (elId, valueAcc) => {
+				return valueAcc(a).mult(valueAcc(b))
+			}
 		}
 	},
 
-	Add_broadcast: (a,b) => {
+	AddBroadcast: (a,b) => {
 		return {
 			getParents: () => [a,b],
 			getValue: (elId, valueAcc) => {
@@ -55,7 +61,7 @@ const ops = {
 		return { 
 			getParents: () => [a],
 			getValue: (elId, valueAcc) => {
-				return valueAcc(elementId).piecewise(pow);
+				return valueAcc(elId).piecewise(pow);
 			}
 		}
 	},

@@ -56,7 +56,7 @@ describe('Can make and get basic output from models', function(){
 		var W = mdl.add(o.Param(Matrix.make([1,1], util.normal(0.1))));
 		var b = mdl.add(o.Param(Matrix.make([1,1], util.normal(0.1))));
 		var out = mdl.add(o.Mult(X,W));
-		var out = mdl.add(o.Add_broadcast(mdl.add(o.Mult(X,W)), b));
+		var out = mdl.add(o.AddBroadcast(mdl.add(o.Mult(X,W)), b));
 		var loss = mdl.add(o.ReduceSum(mdl.add(o.Pow(mdl.add(o.Sub(out, Y)), 2))));
 
 		var Xval = new Matrix([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]);
@@ -65,7 +65,7 @@ describe('Can make and get basic output from models', function(){
 		results = mdl.run([out],[X,Y],[Xval, Yval]);
 	});
 
-	it ('Has a reduce_sum that works', function(){
+	it ('Has a ReduceSum that works', function(){
 		var mdl = new mf.Model();
 		var om = mf.ops.util.ObjOpWrapper(mf.ops.lib, mdl);
 		var X = om.Given();
@@ -73,6 +73,21 @@ describe('Can make and get basic output from models', function(){
 		var inp = new Matrix([1,2,3,4,5,6]);
 		var results = mdl.run([reduced],[X],[inp]);
 		expect(results[0].mx[0][0]).to.equal(21)
+	})
+
+	it ('Has a AddBroadcast that works', function(){
+		var mdl = new mf.Model();
+		var om = mf.ops.util.ObjOpWrapper(mf.ops.lib, mdl);
+
+		var X = om.Given();
+		var Y = om.Given()
+		var abd = om.AddBroadcast(X,Y)
+
+		var Xval = new Matrix([[1.0,1.0], [2.0,2.0], [3.0,3.0]]);
+		var Yval = new Matrix([[2.0],[1.0]]);
+
+		var results = mdl.run([abd],[X,Y],[Xval,Yval]);
+		expect(results[0].mx).to.deep.equal([[3.0,2.0], [4.0,3.0], [5.0,4.0]])
 	})
 
 })

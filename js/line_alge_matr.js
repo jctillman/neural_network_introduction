@@ -32,7 +32,7 @@ class Matrix {
 	}
 
 	add(otherMatr){
-		Matrix.check(otherMatr);
+		Matrix.checkIsMtr(otherMatr);
 		Matrix.checkEqualDims(this, otherMatr);
 		return Matrix.make(this.dims(), (row,col) => {
 			return this.mx[row][col] + otherMatr.mx[row][col];
@@ -40,7 +40,7 @@ class Matrix {
 	}
 
 	add_broadcast(otherMatr){
-		Matrix.check(otherMatr);
+		Matrix.checkIsMtr(otherMatr);
 		Matrix.isVector(otherMatr);
 		return Matrix.make( this.dims(), (row, col) => {
 			return this.mx[row][col] + otherMatr.mx[col][0]
@@ -48,14 +48,14 @@ class Matrix {
 	}
 
 	piecewise(fnc){
-		Matrix.isFnc(fnc);
+		Matrix.checkIsFnc(fnc);
 		return Matrix.make( this.dims(), (row, col) => {
 			return fnc(this.mx[row][col]);
 		})
 	}
 
 	reduce(fnc, start){
-		Matrix.isFnc(fnc);
+		Matrix.checkIsFnc(fnc);
 		return new Matrix([[
 			flatMap(this.mx, util.ident).reduce( (total, element, rowIndex) => {
 				return fnc(total, element);
@@ -68,7 +68,7 @@ class Matrix {
 	}
 
 	mult(otherMatr){
-		Matrix.check(otherMatr)
+		Matrix.checkIsMtr(otherMatr)
 		Matrix.checkMultDims(this, otherMatr);
 		const newRow = this.mx.length;
 		const newCol = otherMatr.mx[0].length;
@@ -81,7 +81,7 @@ class Matrix {
 	}
 
 	static make(dimensions, generator){
-		Matrix.isFnc(generator)
+		Matrix.checkIsFnc(generator)
 		var [rowNum, colNum] = dimensions;
 		var matrixContents = [];
 		for(var x = 0; x < rowNum; x++){
@@ -93,7 +93,7 @@ class Matrix {
 		return new Matrix(matrixContents)
 	}
 
-	static check(otherMatr){
+	static checkIsMtr(otherMatr){
 		(otherMatr instanceof Matrix) || 
 			err("Matrix required.");}
 
@@ -110,7 +110,7 @@ class Matrix {
 		(thisMtr.mx[0].length == otherMatr.mx.length) ||
 			err("Colunms in first matrix must equal rows in second.");}
 
-	static isFnc(fnc){
+	static checkIsFnc(fnc){
 		(typeof fnc == 'function') ||
 			err("Variable must be function.");}
 

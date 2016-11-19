@@ -54,6 +54,14 @@ class Matrix {
 		})
 	}
 
+	hadamard(otherMatr){
+		Matrix.checkIsMtr(otherMatr);
+		Matrix.checkEqualDims(this, otherMatr);
+		return Matrix.make(this.dims(), (row, col) => {
+			return this.mx[row][col] * otherMatr.mx[row][col];
+		});
+	}
+
 	reduce(fnc, start){
 		Matrix.checkIsFnc(fnc);
 		return new Matrix([[

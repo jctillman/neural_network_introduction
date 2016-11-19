@@ -24,9 +24,13 @@ describe('Can do basic gradient descent', function(){
 		var Xval = new Matrix([1.0, 2.0, 3.0]);
 		var Yval = new Matrix([0.0, 0.0, 0.0]);
 
-		//var = new mf.trainers.GradientDescent()
+		var tr = new mf.train.GradientDescent(0.1);
 
-		results = mdl.run([min],[X,Y],[Xval, Yval]);
+		//results = mdl.run([min],[X,Y],[Xval, Yval]);
+
+		trained = tr.run(mdl, min, [X,Y], [Xval, Yval])
+
+		//console.log(results[0].mx[0][0])
 	});
 
 

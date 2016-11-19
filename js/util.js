@@ -55,5 +55,34 @@ const normal = (stdev) => {
 	}
 }
 
-module.exports = {numericNum, numericArray, flatMap,
-	zipWith, sum, err, normal, objMap, ident}
+const randEl = (str) => {
+	return str[Math.floor(Math.random()*str.length)];
+}
+
+const newId = () => {
+	var index = 0;
+	return () => {
+		index++;
+		return [1,2,3,4,5,6].map( (_,i) => {
+			return randEl('abcdefghijklmnopqrstuv');
+		}).join('') + "" + index;
+	}
+}
+
+module.exports = {
+	newId: newId(),
+	numericNum,
+	numericArray,
+	flatMap,
+	zipWith,
+	sum,
+	err,
+	normal,
+	objMap,
+	ident
+}
+
+
+
+
+

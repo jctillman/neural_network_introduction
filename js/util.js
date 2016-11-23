@@ -31,6 +31,8 @@ const sum = (arr) => {
 }
 
 const ident = (x) => x;
+const returnOne = () => 1;
+const returnNegOne = () => -1;
 
 const flatMap = (arr, fnc) => {
 	return arr.reduce( (total, cur) => {
@@ -70,16 +72,14 @@ const newId = () => {
 }
 
 module.exports = {
+
 	newId: newId(),
-	numericNum,
-	numericArray,
-	flatMap,
-	zipWith,
-	sum,
-	err,
-	normal,
-	objMap,
-	ident
+
+	returnOne, returnNegOne, normal, sum,
+
+	numericNum, numericArray, err,
+	
+	flatMap,zipWith, objMap, ident		
 }
 
 

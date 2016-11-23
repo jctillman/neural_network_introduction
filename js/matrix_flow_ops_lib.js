@@ -13,6 +13,7 @@ const Param = (initMatrix) => {
 	);
 }
 
+
 const Given = () => {
 	return new Operation(
 		'Given', [], () => Given(),
@@ -21,27 +22,26 @@ const Given = () => {
 	);
 }
 
+
 const Add = (a,b) => {
-	const toOne = (x) => 1;
 	return new Operation(
 		'Add', [a,b], () => Add(a,b),
 		(elId, valueAcc) => valueAcc(a).add(valueAcc(b)),
 		(elId, valueAcc, wrt, derivAcc) => {
-			return valueAcc(a).piecewise(toOne).hadamard(derivAcc(elId));
+			return valueAcc(a).piecewise(util.returnOne).hadamard(derivAcc(elId));
 		}
 	);
 }
 
+
 const Sub = (a,b) => {
-	const toOne = () => 1;
-	const toNegOne = () => -1;
 	return new Operation(
 		'Sub', [a,b], () => Sub(a,b),
 		(elId, valueAcc) => valueAcc(a).sub(valueAcc(b)),
 		(elId, valueAcc, wrt, derivAcc) => {
 			return (wrt == a) ?
-				valueAcc(a).piecewise(toOne).hadamard(derivAcc(elId)) : 
-				valueAcc(b).piecewise(toNegOne).hadamard(derivAcc(elId));
+				valueAcc(a).piecewise(util.returnOne).hadamard(derivAcc(elId)) : 
+				valueAcc(b).piecewise(util.returnNegOne).hadamard(derivAcc(elId));
 		}
 	);
 }
@@ -53,6 +53,7 @@ const Mult = (a,b) => {
 		() => "TODO THIS NEEDS A DERIVATIVE"
 	);
 }
+
 
 const AddBroadcast = (a,b) => {
 	return new Operation(
@@ -67,6 +68,7 @@ const AddBroadcast = (a,b) => {
 	)
 }
 
+
 const Pow = (a,powr) => {
 	const pow = (x) => Math.pow(x,powr);
 	const deriver = (x) => x * Math.pow(x,powr-1);
@@ -79,14 +81,14 @@ const Pow = (a,powr) => {
 	)
 }
 
+
 const ReduceSum = (a) => {
-	const retOne = () => 1;
 	return new Operation(
 		'ReduceSum', [a], () => ReduceSum(a),
 		(elId, valueAcc) => valueAcc(a).reduce( (x,y) => x + y, 0),
 		(elId, valueAcc, wrt, derivAcc) => {
 			const innerDeriv = derivAcc(elId).mx[0][0];
-			return valueAcc(a).piecewise( (el) => {
+			return valueAcc(elId).piecewise( (el) => {
 				return innerDeriv;
 			});
 		}

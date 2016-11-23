@@ -10,6 +10,7 @@ class Operation{
 		(Array.isArray(parents)  == true) || err("'Parents' must be array.")
 		(typeof copy == 'function') || err("'Type' must be function.")
 		(typeof getValue == 'function') || err("'getValue' must be function.")
+		//TODO: Add something for deriveWRT.
 
 		this.type = type;
 		this.getParents = () => parents;

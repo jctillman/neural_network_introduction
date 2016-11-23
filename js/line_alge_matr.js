@@ -33,6 +33,16 @@ class Matrix {
 		}));
 	}
 
+	equalish(otherMatr, tolerance){
+		Matrix.checkIsMtr(otherMatr);
+		Matrix.checkEqualDims(this, otherMatr);
+		const mtrFlat = util.flatMap(this.mx,util.ident);
+		const otherMtrFlat = util.flatMap(otherMatr.mx,util.ident);
+		return mtrFlat.every( (_, i) => {
+			return Math.abs(mtrFlat[i] - otherMtrFlat[i]) < tolerance;
+		})
+	}
+
 	add(otherMatr){
 		Matrix.checkIsMtr(otherMatr);
 		Matrix.checkEqualDims(this, otherMatr);

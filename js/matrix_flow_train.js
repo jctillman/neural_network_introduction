@@ -19,7 +19,11 @@ class GradientDescent extends AbstractOptimizer {
 	run(model, minId, givenIds, givenVals){
 
 		var res = model.run([minId],givenIds,givenVals)
-		var gradient = model.getAllGradients(minId)
+		var gradient = model.getAllParamGradients(minId)
+		var changedGradients = util.objMap(gradient, (op, key) => {
+			return op.piecewise( x => -x * this.lr)
+		});
+		return model.newAltered(changedGradients)
 	}
 
 }

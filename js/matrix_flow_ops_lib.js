@@ -2,116 +2,119 @@ const Model = require('./matrix_flow_model.js');
 const util = require('./util.js');
 const err = util.err;
 
-const ops = {
+class Operation{
 
-	Param: (initMatrix) => {
-		var value = initMatrix
-		return {
-			getParents: () => [],
-			getValue: (elId, valueAcc) => value,
-			deriveWRT: (elId, valueAcc, wrt, derivAcc) => {
-				err("Params have zero derivative wrt anything.")
-			}
-		};
-	},
-
-	Given: () => {
-		return {
-			getParents: () => [],
-			getValue: (elId, valueAcc) => valAcc(elId),
-			deriveWRT: (elId, valueAcc, wrt, derivAcc) => {
-				err("Params have zero derivative wrt anything.")
-			}
-		};
-	},
-
-	Add: (a,b) => {
-		const toOne = (x) => 1;
-		return {
-			getParents: () => [a,b],
-			getValue: (elId, valueAcc) => {
-				return valueAcc(a).add(valueAcc(b))	
-			},
-			deriveWRT: (elId, valueAcc, wrt, derivAcc) => {
-				(wrt == a || wrt == b) || err("No derivative wrt " + wrt);
-				return valueAcc(a).piecewise(toOne).hadamard(derivAcc(elId));
-			}
-		}
-	},
-
-	Sub: (a,b) => {
-		const toOne = () => 1;
-		const toNegOne = () => -1;
-		return {
-			getParents: () => [a,b],
-			getValue: (elId, valueAcc) => {
-				return valueAcc(a).sub(valueAcc(b))
-			},
-			deriveWRT: (elId, valueAcc, wrt, derivAcc) => {
-				(wrt == a || wrt == b) || err("No derivative wrt " + wrt);
-				return (wrt == a) ?
-					valueAcc(a).piecewise(toOne).hadamard(derivAcc(elId)) : 
-					valueAcc(b).piecewise(toNegOne).hadamard(derivAcc(elId));
-			}
-		}
-	},
-
-	Mult: (a,b) => {
-		return {
-			getParents: () => [a,b],
-			getValue: (elId, valueAcc) => {
-				return valueAcc(a).mult(valueAcc(b))
-			}
-		}
-	},
-
-	AddBroadcast: (a,b) => {
-		return {
-			getParents: () => [a,b],
-			getValue: (elId, valueAcc) => {
-				return valueAcc(a).add_broadcast(valueAcc(b));
-			}//,
-			//deriveWRT: (wrt, valueAcc) => {
-			//	(wrt == a || wrt == b) || err("No derivative wrt " + wrt);
-			//	return (wrt == a) ?
-			//
-			//}
-
-		}
-	},
-
-	Pow: (a,powr) => {
-		const pow = (x) => Math.pow(x,powr);
-		const deriver = (x) => x * Math.pow(x,power-1);
-		return { 
-			getParents: () => [a],
-			getValue: (elId, valueAcc) => {
-				return valueAcc(elId).piecewise(pow);
-			},
-			deriveWRT: (elId, valueAcc, wrt, derivAcc) => {
-				(wrt == a) || err("No derivative wrt " + wrt);
-				return valueAcc(a).piecewise(deriver).hadamard(derivAcc(elId));
-			}
-		}
-	},
-
-	ReduceSum: (a) => {
-		const retOne = () => 1;
-		return { 
-			getParents: () => [a],
-			getValue: (elId, valueAcc) => {
-				return valueAcc(a).reduce( (x,y) => x + y, 0);
-			},
-			deriveWRT: (elId, valueAcc, wrt, derivAcc) => {
-				(wrt == a) || err("No derivative wrt " + wrt);
-				const innerDeriv = derivAcc(elId).mx[0][0];
-				return valueAcc(a).piecewise( (el) => {
-					return innerDeriv;
-				});
-			}
+	constructor(type, parents, copy, getValue, deriveWRT){
+		this.type = type;
+		this.getParents = () => parents;
+		this.copy = copy,
+		this.getValue = getValue;
+		this.deriveWRT = (elId, valueAcc, wrt, deriveAcc) => {
+			(parents.indexOf(wrt) > -1) || 
+				err ("No derivative with respect to that.");
+			return deriveWRT(elId, valueAcc, wrt, deriveAcc)
 		}
 	}
 
 }
 
-module.exports = ops
+const Param = (initMatrix) => {
+	const value = initMatrix
+	return new Operation(
+		'Param', [], (newMatrix) => Param(newMatrix),
+		(elId, valueAcc) => value,
+		(elId, valueAcc, wrt, derivAcc) => {}
+	);
+}
+
+const Given = () => {
+	return new Operation(
+		'Given', [], () => Given(),
+		(elId, valueAcc) => valAcc(elId),
+		(elId, valueAcc, wrt, derivAcc) => {}
+	);
+}
+
+const Add = (a,b) => {
+	const toOne = (x) => 1;
+	return new Operation(
+		'Add', [a,b], () => Add(a,b),
+		(elId, valueAcc) => valueAcc(a).add(valueAcc(b)),
+		(elId, valueAcc, wrt, derivAcc) => {
+			return valueAcc(a).piecewise(toOne).hadamard(derivAcc(elId));
+		}
+	);
+}
+
+const Sub = (a,b) => {
+	const toOne = () => 1;
+	const toNegOne = () => -1;
+	return new Operation(
+		'Sub', [a,b], () => Sub(a,b),
+		(elId, valueAcc) => valueAcc(a).sub(valueAcc(b)),
+		(elId, valueAcc, wrt, derivAcc) => {
+			return (wrt == a) ?
+				valueAcc(a).piecewise(toOne).hadamard(derivAcc(elId)) : 
+				valueAcc(b).piecewise(toNegOne).hadamard(derivAcc(elId));
+		}
+	);
+}
+
+const Mult = (a,b) => {
+	return new Operation(
+		'Mult', [a,b], () => Mult(a,b),
+		(elId, valueAcc) => valueAcc(a).mult(valueAcc(b)),
+		() => "TODO THIS NEEDS A DERIVATIVE"
+	);
+}
+
+const AddBroadcast = (a,b) => {
+	return new Operation(
+		'AddBroadcast', [a,b], () => AddBroadcast(),
+		(elId, valueAcc) => valueAcc(a).add_broadcast(valueAcc(b))
+		//,
+		//deriveWRT: (wrt, valueAcc) => {
+		//	(wrt == a || wrt == b) || err("No derivative wrt " + wrt);
+		//	return (wrt == a) ?
+		//
+		//}
+	)
+}
+
+const Pow = (a,powr) => {
+	const pow = (x) => Math.pow(x,powr);
+	const deriver = (x) => x * Math.pow(x,powr-1);
+	return new Operation(
+		'Pow', [a], () => Pow(a,powr),
+		(elId, valueAcc) => valueAcc(a).piecewise(pow),
+		(elId, valueAcc, wrt, derivAcc) => {
+			return valueAcc(a).piecewise(deriver).hadamard(derivAcc(elId));
+		}
+	)
+}
+
+const ReduceSum = (a) => {
+	const retOne = () => 1;
+	return new Operation(
+		'ReduceSum', [a], () => ReduceSum(a),
+		(elId, valueAcc) => valueAcc(a).reduce( (x,y) => x + y, 0),
+		(elId, valueAcc, wrt, derivAcc) => {
+			const innerDeriv = derivAcc(elId).mx[0][0];
+			return valueAcc(a).piecewise( (el) => {
+				return innerDeriv;
+			});
+		}
+	)
+}
+
+
+module.exports = {
+	Param,
+	Given,
+	Add,
+	Sub,
+	Mult,
+	AddBroadcast,
+	Pow,
+	ReduceSum
+}

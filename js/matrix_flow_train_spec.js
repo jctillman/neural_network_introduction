@@ -8,7 +8,7 @@ const Matrix = la.Matrix;
 
 describe('Can do basic gradient descent', function(){
 
-	it('Can do really basic gradient descent', function(){
+	xit('Can do really basic gradient descent', function(){
 
 		var mdl = new mf.Model();
 		var o = mf.ops.util.ObjOpWrapper(mf.ops.lib, mdl);
@@ -22,13 +22,17 @@ describe('Can do basic gradient descent', function(){
 		var min = o.ReduceSum(o.Sub(Y,R));		
 
 		var Xval = new Matrix([1.0, 2.0, 3.0]);
-		var Yval = new Matrix([0.0, 0.0, 0.0]);
+		var Yval = new Matrix([5.0, 5.0, 5.0]);
 
 		var tr = new mf.train.GradientDescent(0.1);
 
 		//results = mdl.run([min],[X,Y],[Xval, Yval]);
 
 		trained = tr.run(mdl, min, [X,Y], [Xval, Yval])
+
+		console.log("TRAINED")
+		console.log(trained)
+
 
 		//console.log(results[0].mx[0][0])
 	});

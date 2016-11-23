@@ -25,6 +25,8 @@ class Matrix {
 
 	col(num){ return this.mx.map( (r) => r[num]);}
 
+	copy() { return this.piecewise((x) => x)}
+
 	trans(){
 		return new Matrix(this.mx[0].map( (_, i) => {
 			return this.col(i);

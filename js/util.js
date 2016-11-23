@@ -40,7 +40,7 @@ const flatMap = (arr, fnc) => {
 
 const objMap = (obj, fnc) => {
 	return Object.keys(obj).reduce( (retObj, key) => {
-		retObj[key] = fnc(obj[key]);
+		retObj[key] = fnc(obj[key],key);
 		return retObj;
 	}, {})
 }

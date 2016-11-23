@@ -7,11 +7,10 @@ const Matrix = require('./line_alge.js').Matrix;
 // or matrixes.
 class Model{
 	
-	constructor(){
-		this.id = util.newId();
-		this.opStore = [];
-		this.valueAccs = [];
-		this.parentChildMap = {};
+	constructor(opStore, valueAccs, parentChildMap){
+		this.opStore = opStore || [];
+		this.valueAccs = valueAccs || [];
+		this.parentChildMap = parentChildMap || {};
 	}
 
 	run(idsToGet, paramIds, paramValues){
@@ -37,6 +36,8 @@ class Model{
 
 		//Finally, recursively get the values
 		//for the ids we're interested in.
+		//console.log(idsToGet)
+		//console.log(this.opStore)
 		var returnValue = idsToGet.map(valueAcc);
 
 		//Save the values everywhere for use
@@ -67,16 +68,13 @@ class Model{
 		return opId;
 	}
 
-	getAllGradients(minId){
+	getAllParamGradients(minId){
 
-		
-		const valueAcc = this.valueAccs[this.valueAccs.length-1];
 		const toZero = () => 0;
-
-		Model.isScalar(valueAcc(minId));
+		const valueAcc = this.valueAccs[this.valueAccs.length-1];
 
 		var idDerivMap = {}
-		idDerivMap[minId] = new Matrix([1]);
+		idDerivMap[minId] = valueAcc(minId).piecewise( () => 1);
 
 		const derivAcc = (someId) => {
 			if (idDerivMap[someId] !== undefined){
@@ -92,14 +90,39 @@ class Model{
 		}
 
 		Object.keys(this.opStore).forEach(derivAcc);
-
-		Object.keys(this.opStore).forEach(x => {
-			console.log(derivAcc(x))
+	
+		var copied = util.objMap(idDerivMap, (mtr) => mtr.copy());	
+	
+		Object.keys(copied).forEach((x) => {
+			if (this.opStore[x].type != 'Param'){
+				delete copied[x];
+			}
 		})
+		//console.log("huh")
+		//console.log(copied)
 
-
-
+		return copied;
 	}
+
+	newAltered(paramChanges){
+
+		const valueAcc = this.valueAccs[this.valueAccs.length-1];
+		//console.log("In param changes")
+		//console.log(paramChanges)
+		var altered = util.objMap(this.opStore, (op, key) => {
+			//return op
+			if (paramChanges[key]){
+				return op.copy(valueAcc(key).add(paramChanges[key]));
+			}else{
+				return op;
+			}
+		});
+		//console.log(altered)
+
+		return new Model(altered, this.valueAccs, this.parentChildMap)
+	}
+
+
 
 	static isScalar(mtr){
 		(mtr.mx[0].length == 1 && mtr.mx.length == 1) ||

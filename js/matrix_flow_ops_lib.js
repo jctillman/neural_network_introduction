@@ -1,22 +1,8 @@
 const Model = require('./matrix_flow_model.js');
+const Operation = require('./matrix_flow_ops_operation.js')
 const util = require('./util.js');
 const err = util.err;
 
-class Operation{
-
-	constructor(type, parents, copy, getValue, deriveWRT){
-		this.type = type;
-		this.getParents = () => parents;
-		this.copy = copy,
-		this.getValue = getValue;
-		this.deriveWRT = (elId, valueAcc, wrt, deriveAcc) => {
-			(parents.indexOf(wrt) > -1) || 
-				err ("No derivative with respect to that.");
-			return deriveWRT(elId, valueAcc, wrt, deriveAcc)
-		}
-	}
-
-}
 
 const Param = (initMatrix) => {
 	const value = initMatrix

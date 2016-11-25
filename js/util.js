@@ -31,6 +31,14 @@ const sum = (arr) => {
 }
 
 const ident = (x) => x;
+
+const addPropReturnObj = (obj, prop, val) => {
+	obj[prop] = val;
+	return obj;
+}
+
+
+
 const returnOne = () => 1;
 const returnNegOne = () => -1;
 
@@ -79,7 +87,7 @@ module.exports = {
 
 	numericNum, numericArray, err,
 	
-	flatMap,zipWith, objMap, ident		
+	flatMap, zipWith, objMap, ident, addPropReturnObj	
 }
 
 

@@ -12,7 +12,6 @@ class Operation{
 		(typeof getValue == 'function') || err("'getValue' must be function.")
 		(typeof deriveWRT == 'function') || err("'deriveWRT' must be function.")
 
-
 		this.type = type;
 		this.getParents = () => parents;
 		this.copy = copy,

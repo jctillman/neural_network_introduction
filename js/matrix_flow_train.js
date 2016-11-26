@@ -28,7 +28,7 @@ class GradientDescent extends AbstractOptimizer {
 }
 
 
-class MomentGradientDescent extends AbstractOptimizer {
+class MomentumGradientDescent extends AbstractOptimizer {
 
 	constructor(lr, momentum_decay){
 		super();
@@ -52,7 +52,7 @@ class MomentGradientDescent extends AbstractOptimizer {
 			});
 		}
 
-		this.direction = obj.map(changedGradients, (op, key) => {
+		this.direction = util.objMap(changedGradients, (op, key) => {
 			return changedGradients[key].add(this.direction[key]);
 		})
 
@@ -64,5 +64,6 @@ class MomentGradientDescent extends AbstractOptimizer {
 
 module.exports = {
 	AbstractOptimizer,
-	GradientDescent
+	GradientDescent,
+	MomentumGradientDescent
 }

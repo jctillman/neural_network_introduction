@@ -61,9 +61,44 @@ class MomentumGradientDescent extends AbstractOptimizer {
 
 }
 
+class Adagrad extends AbstractOptimizer {
+
+	constructor(lr, fudge){
+		super();
+		this.lr = lr
+		this.fudge = fudge || 0.0001
+		this.previousSquared = undefined
+	}
+
+	run(model, minId, givenIds, givenVals){
+		var res = model.run([minId],givenIds,givenVals);
+		var gradient = model.getAllParamGradients(minId);
+
+		if(this.previousSquared){
+			this.previousSquared = util.objMap(gradient, (op, key) => {
+				return this.previousSquared[key].add(op.piecewise(x => Math.pow(x,2)))
+			});
+		}else{
+			this.previousSquared = util.objMap(gradient, (op, key) => {
+				return op.piecewise( x => Math.pow(x,2));
+			})
+		}
+
+		var changedGradients = util.objMap(gradient, (op, key) => {
+			var sqrtPrevReciprocal = this.previousSquared[key].piecewise(
+				x => 1.0/( Math.sqrt(x) + this.fudge) );
+			return op.piecewise( x => -x * this.lr).hadamard(sqrtPrevReciprocal);
+		});
+
+		return model.newAltered(changedGradients);
+	}
+
+}
+
 
 module.exports = {
 	AbstractOptimizer,
 	GradientDescent,
-	MomentumGradientDescent
+	MomentumGradientDescent,
+	Adagrad
 }

@@ -105,7 +105,6 @@ class Model{
 	}
 
 	newAltered(paramChanges){
-
 		const valueAcc = this.valueAccs[this.valueAccs.length-1];
 		var altered = util.objMap(this.opStore, (op, key) => {
 			return (paramChanges[key]) ?

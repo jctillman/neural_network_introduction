@@ -4,7 +4,7 @@ const util = require('./util.js');
 const la = require('./line_alge.js');
 const Matrix = la.Matrix;
 
-describe('Cross product of operations and optimizers work', function(){
+describe('Integration Testing: Cross product of operations and optimizers work', function(){
 
 	var testOptimizer = function(optimizer_maker, optimizer_name){
 		describe('All operations work with optimizer ' + optimizer_name, function(){
@@ -120,7 +120,7 @@ describe('Cross product of operations and optimizers work', function(){
 
 				var [outputMatrix] = mdl.run([goal],[g],[goalMatrix])
 				
-				for(var x = 0; x < 200; x++)
+				for(var x = 0; x < 50; x++)
 					mdl = tr.run(mdl, goal,[g],[goalMatrix])
 
 				var [a] = mdl.run([fst],[],[]);
@@ -134,6 +134,7 @@ describe('Cross product of operations and optimizers work', function(){
 	var optimizers = [
 		[() => new mf.train.GradientDescent(0.05), 'Gradient Descent'],
 		[() => new mf.train.MomentumGradientDescent(0.05,0.75), 'Momentum Gradient Descent'],
+		[() => new mf.train.Adagrad(0.25), "Adagrad"]
 	];
 
 	optimizers.forEach(function(opt){

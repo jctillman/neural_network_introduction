@@ -1,6 +1,7 @@
 const Model = require('./matrix_flow_model.js');
 const la = require('./line_alge.js');
 const util = require('./util.js');
+const MtrCol = la.MtrCol;
 const err = util.err;
 
 class AbstractOptimizer {
@@ -18,11 +19,9 @@ class GradientDescent extends AbstractOptimizer {
 
 	run(model, minId, givenIds, givenVals){
 		var res = model.run([minId],givenIds,givenVals);
-		var gradient = model.getAllParamGradients(minId);
-		var changedGradients = util.objMap(gradient, (op, key) => {
-			return op.piecewise( x => -x * this.lr);
-		});
-		return model.newAltered(changedGradients)
+		var gradient = new MtrCol(model.getAllParamGradients(minId));
+		var changedGradients = gradient.piecewise( x => -x * this.lr);
+		return model.newAltered(changedGradients.extr());
 	}
 
 }
@@ -39,24 +38,16 @@ class MomentumGradientDescent extends AbstractOptimizer {
 
 	run(model, minId, givenIds, givenVals){
 		var res = model.run([minId],givenIds,givenVals);
-		var gradient = model.getAllParamGradients(minId);
-		var changedGradients = util.objMap(gradient, (op, key) => {
-			return op.piecewise( x => -x * this.lr);
-		});
+		var gradient = new MtrCol(model.getAllParamGradients(minId));
+		var changedGradients = gradient.piecewise( x => -x * this.lr);
 
-		if (this.direction == undefined){
-			this.direction = util.objMap(gradient, (op) => op.piecewise( () => 0));
-		}else{
-			this.direction = util.objMap(this.direction, (op, key) => {
-				return op.piecewise( x => x * this.momentum_decay);
-			});
-		}
+		this.direction = (this.direction == undefined) ? 
+			gradient.zero() : 
+			this.direction.piecewise( x => x * this.momentum_decay);
 
-		this.direction = util.objMap(changedGradients, (op, key) => {
-			return changedGradients[key].add(this.direction[key]);
-		})
+		this.direction = this.direction.add(changedGradients)
 
-		return model.newAltered(this.direction);
+		return model.newAltered(this.direction.extr());
 	}
 
 }

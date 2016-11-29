@@ -8,13 +8,13 @@ const apro = util.addPropReturnObj;
 class Model{
 	
 
-	//1. opStore: object storing operations in the graph
-	//2. valueAccs: array of functions mapping object to matrix values
-	//3. parentChildMap: what it says on the box
-	constructor(opStore, valueAccs, parentChildMap){
-		this.opStore = opStore || [];
-		this.valueAccs = valueAccs || [];
-		this.parentChildMap = parentChildMap || {};
+	// opStore - object mapping object id -> operation itself
+	// valueAccs - array of functions, each mapping object id -> matrix value
+	// parentChildMap - object mapping object id -> object id
+	constructor(opStore = [], valueAccs = [], parentChildMap = []){
+		this.opStore = opStore;
+		this.valueAccs = valueAccs;
+		this.parentChildMap = parentChildMap;
 	}
 
 

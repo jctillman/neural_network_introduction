@@ -96,12 +96,11 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 
 				var [outputMatrix] = mdl.run([goal],[g],[goalMatrix])
 				
-				for(var x = 0; x < 200; x++)
+				for(var x = 0; x < 100; x++)
 					mdl = tr.run(mdl, goal,[g],[goalMatrix])
 
 				var [a,b] = mdl.run([fst, snd],[],[]);
 				var diff = a.add_broadcast(b);
-
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
 			});
 
@@ -132,9 +131,10 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 	}
 
 	var optimizers = [
-		[() => new mf.train.GradientDescent(0.05), 'Gradient Descent'],
+		[() => new mf.train.GradientDescent(0.1), 'Gradient Descent'],
 		[() => new mf.train.MomentumGradientDescent(0.05,0.75), 'Momentum Gradient Descent'],
-		[() => new mf.train.Adagrad(0.25), "Adagrad"]
+		[() => new mf.train.Adagrad(0.25), "Adagrad"],
+		[() => new mf.train.RMSProp(1), "RMSProp"]
 	];
 
 	optimizers.forEach(function(opt){

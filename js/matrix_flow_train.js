@@ -4,28 +4,7 @@ const util = require('./util.js');
 const MtrCol = la.MtrCol;
 const err = util.err;
 
-class AbstractOptimizer {
-
-	constructor(){}
-
-}
-
-class GradientDescent extends AbstractOptimizer {
-
-	constructor(lr){
-		super();
-		this.lr = lr
-	}
-
-	run(model, minId, givenIds, givenVals){
-		var res = model.run([minId],givenIds,givenVals);
-		var gradient = new MtrCol(model.getAllParamGradients(minId));
-		var changedGradients = gradient.piecewise( x => -x * this.lr);
-		return model.newAltered(changedGradients.extr());
-	}
-
-}
-
+class AbstractOptimizer {}
 
 class MomentumGradientDescent extends AbstractOptimizer {
 
@@ -52,33 +31,14 @@ class MomentumGradientDescent extends AbstractOptimizer {
 
 }
 
-class Adagrad extends AbstractOptimizer {
+class GradientDescent extends MomentumGradientDescent {
 
-	constructor(lr, fudge){
-		super();
-		this.lr = lr
-		this.fudge = fudge || 0.0001
-		this.previousSquared = undefined
+	constructor(lr){
+		super(lr, 0);
 	}
 
-	run(model, minId, givenIds, givenVals){
-
-		var res = model.run([minId],givenIds,givenVals);
-		var gradient = new MtrCol(model.getAllParamGradients(minId));
-
-		this.previousSquared = (this.previousSquared !== undefined) ?
-			this.previousSquared.add(gradient.pow(2)) : 
-			gradient.pow(2);
-
-		var sqrtPrevReciprocal = this.previousSquared.piecewise( x => {
-			return 1.0 / (Math.sqrt(x) + this.fudge);
-		});
-
-		var alterAmount = gradient.piecewise(x => -x * this.lr).hadamard(sqrtPrevReciprocal)
-
-		return model.newAltered(alterAmount.extr());
-	}
 }
+
 
 class RMSProp extends AbstractOptimizer {
 
@@ -107,6 +67,15 @@ class RMSProp extends AbstractOptimizer {
 
 		return model.newAltered(alterAmount.extr());
 	}
+}
+
+
+class Adagrad extends RMSProp {
+
+	constructor(lr, fudge){
+		super(lr, 1, fudge);
+	}
+
 }
 
 

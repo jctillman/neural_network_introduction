@@ -62,26 +62,21 @@ class Adagrad extends AbstractOptimizer {
 	}
 
 	run(model, minId, givenIds, givenVals){
+
 		var res = model.run([minId],givenIds,givenVals);
-		var gradient = model.getAllParamGradients(minId);
+		var gradient = new MtrCol(model.getAllParamGradients(minId));
 
-		if(this.previousSquared){
-			this.previousSquared = util.objMap(gradient, (op, key) => {
-				return this.previousSquared[key].add(op.piecewise(x => Math.pow(x,2)))
-			});
-		}else{
-			this.previousSquared = util.objMap(gradient, (op, key) => {
-				return op.piecewise( x => Math.pow(x,2));
-			})
-		}
+		this.previousSquared = (this.previousSquared !== undefined) ?
+			this.previousSquared.add(gradient.pow(2)) : 
+			gradient.pow(2);
 
-		var changedGradients = util.objMap(gradient, (op, key) => {
-			var sqrtPrevReciprocal = this.previousSquared[key].piecewise(
-				x => 1.0/( Math.sqrt(x) + this.fudge) );
-			return op.piecewise( x => -x * this.lr).hadamard(sqrtPrevReciprocal);
+		var sqrtPrevReciprocal = this.previousSquared.piecewise( x => {
+			return 1.0 / (Math.sqrt(x) + this.fudge);
 		});
 
-		return model.newAltered(changedGradients);
+		var alterAmount = gradient.piecewise(x => -x * this.lr).hadamard(sqrtPrevReciprocal)
+
+		return model.newAltered(alterAmount.extr());
 	}
 }
 
@@ -96,28 +91,21 @@ class RMSProp extends AbstractOptimizer {
 	}
 
 	run(model, minId, givenIds, givenVals){
+
 		var res = model.run([minId],givenIds,givenVals);
-		var gradient = model.getAllParamGradients(minId);
+		var gradient = new MtrCol(model.getAllParamGradients(minId));
 
-		if(this.previousSquared){
-			this.previousSquared = util.objMap(gradient, (op, key) => {
-				return this.previousSquared[key].
-					add(op.piecewise(x => Math.pow(x,2))).
-					piecewise(x => x * this.decay);
-			});
-		}else{
-			this.previousSquared = util.objMap(gradient, (op, key) => {
-				return op.piecewise( x => Math.pow(x,2));
-			})
-		}
+		this.previousSquared = (this.previousSquared !== undefined) ?
+			this.previousSquared.add(gradient.pow(2)).piecewise(x => x * this.decay) : 
+			gradient.pow(2);
 
-		var changedGradients = util.objMap(gradient, (op, key) => {
-			var sqrtPrevReciprocal = this.previousSquared[key].piecewise(
-				x => 1.0/( Math.sqrt(x) + this.fudge) );
-			return op.piecewise( x => -x * this.lr).hadamard(sqrtPrevReciprocal);
+		var sqrtPrevReciprocal = this.previousSquared.piecewise( x => {
+			return 1.0 / (Math.sqrt(x) + this.fudge);
 		});
 
-		return model.newAltered(changedGradients);
+		var alterAmount = gradient.piecewise(x => -x * this.lr).hadamard(sqrtPrevReciprocal)
+
+		return model.newAltered(alterAmount.extr());
 	}
 }
 

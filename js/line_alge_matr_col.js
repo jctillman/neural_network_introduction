@@ -30,6 +30,8 @@ class MtrCol{
 
 	add(otherCol){ return this.operator(otherCol, "add"); }
 
+	hadamard(otherCol){ return this.operator(otherCol, "hadamard"); }
+
 	piecewise(fnc){
 		return new MtrCol( util.objMap( this.obj, (mtr) => {
 			return mtr.piecewise(fnc);

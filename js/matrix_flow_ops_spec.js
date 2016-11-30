@@ -24,14 +24,12 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 
 				var inter = o.Add(fst,snd);
 				var goal = o.Pow(o.Sub(inter, g),2)
-
-				var [outputMatrix] = mdl.run([goal],[g],[goalMatrix])
 				
 				for(var x = 0; x < 50; x++)
 					mdl = tr.run(mdl, goal,[g],[goalMatrix])
 
-				var [a,b] = mdl.run([fst, snd],[],[]);
-				var diff = a.add(b);
+				var va = mdl.run([fst, snd],[],[]);
+				var diff = va(fst).add(va(snd));
 				expect(diff.equalish(goalMatrix,0.1)).to.equal(true)
 			});
 
@@ -46,15 +44,13 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 
 				var m = o.Sub(fst, g);
 				var goal = o.Pow(m,2);
-				var [outputMatrix] = mdl.run([goal],[g],[goalMatrix])
 
 				for(var x = 0; x < 50; x++)
 					mdl = tr.run(mdl, goal,[g],[goalMatrix])
 
-				var [a] = mdl.run([fst],[],[]);
-				var diff = a.sub(goalMatrix);
+				var va = mdl.run([fst],[],[]);
+				expect(va(fst).equalish(goalMatrix,0.1)).to.equal(true);
 
-				expect(a.equalish(goalMatrix,0.1)).to.equal(true)
 			});
 
 			it('Can create and train model using Mult', function(){
@@ -69,14 +65,12 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 
 				var inter = o.Mult(fst,snd);
 				var goal = o.Pow(o.Sub(g, inter),2)
-
-				var [outputMatrix] = mdl.run([goal],[g],[goalMatrix])
 				
 				for(var x = 0; x < 100; x++)
 					mdl = tr.run(mdl, goal,[g],[goalMatrix])
 
-				var [a,b] = mdl.run([fst, snd],[],[]);
-				var diff = a.mult(b);
+				var va = mdl.run([fst, snd],[],[]);
+				var diff = va(fst).mult(va(snd));
 
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
 			});
@@ -93,14 +87,12 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 
 				var inter = o.AddBroadcast(fst,snd);
 				var goal = o.Pow(o.Sub(g, inter),2)
-
-				var [outputMatrix] = mdl.run([goal],[g],[goalMatrix])
 				
 				for(var x = 0; x < 100; x++)
 					mdl = tr.run(mdl, goal,[g],[goalMatrix])
 
-				var [a,b] = mdl.run([fst, snd],[],[]);
-				var diff = a.add_broadcast(b);
+				var va = mdl.run([fst, snd],[],[]);
+				var diff = va(fst).add_broadcast(va(snd));
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
 			});
 
@@ -113,17 +105,14 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 				var g = o.Given();
 				var goalMatrix = new Matrix([2]);
 
-
 				var inter = o.ReduceSum(fst);
 				var goal = o.Pow(o.Sub(g, inter),2)
-
-				var [outputMatrix] = mdl.run([goal],[g],[goalMatrix])
 				
 				for(var x = 0; x < 50; x++)
 					mdl = tr.run(mdl, goal,[g],[goalMatrix])
 
-				var [a] = mdl.run([fst],[],[]);
-				var diff = a.reduce( (x,y) => x + y, 0);
+				var va = mdl.run([fst],[],[]);
+				var diff = va(fst).reduce( (x,y) => x + y, 0);
 
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
 			});

@@ -52,7 +52,4 @@ describe('Possesses a matrix abstraction', function(){
 		expect(willThrow).to.throw()
 	})
 
-
-
-
 })

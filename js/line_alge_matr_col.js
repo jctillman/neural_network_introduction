@@ -16,9 +16,7 @@ class MtrCol{
 		this.obj = obj;
 	}
 
-	extr(){
-		return this.obj;
-	}
+	extr(){ return this.obj; }
 
 	operator(otherCol, operatorName){
 		MtrCol.checkIsCol(otherCol);

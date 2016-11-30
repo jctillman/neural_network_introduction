@@ -22,6 +22,8 @@ class Model{
 
 		//Take the two arrays of paramIds and turn it
 		//into an object mapping from paramIds to paramValues.
+		//This is object immutable because it is inside the closure
+		//for the return value, nicely enough.
 		var idValueMap = paramIds.reduce(function(obj,_,i){
 			return apro(obj,paramIds[i],paramValues[i]);
 		},{});
@@ -38,16 +40,14 @@ class Model{
 			}
 		}
 
-		//This both gets all of the values that were
-		//asked for and populates valueAcc with the values
-		//it needs to calculate anything in the graph.
-		var returnValue = idsToGet.map(valueAcc);
+		//This creates a working valueAcc for idsToGet
+		//and for everything upstream of idsToGet.
+		idsToGet.forEach(valueAcc);
 
-		//Store the thus populated value acc
+		//Store the thus populated value accessor,
+		//and then return it.
 		this.valueAccs.push(valueAcc)
-
-		//And return this.
-		return returnValue
+		return valueAcc
 	}
 
 	add(opsInstance){

@@ -3,7 +3,6 @@ const util = require('./util.js');
 const zipWith = util.zipWith;
 const sum = util.sum;
 const err = util.err;
-const numericNum = util.numericNum;
 const numericArr = util.numericArray;
 const flatMap = util.flatMap;
 
@@ -51,38 +50,6 @@ class Matrix {
 		});
 	}
 
-	add_broadcast(otherMatr){
-		Matrix.checkIsMtr(otherMatr);
-		Matrix.isVector(otherMatr);
-		return Matrix.make( this.dims(), (row, col) => {
-			return this.mx[row][col] + otherMatr.mx[col][0]
-		});
-	}
-
-	piecewise(fnc){
-		Matrix.checkIsFnc(fnc);
-		return Matrix.make( this.dims(), (row, col) => {
-			return fnc(this.mx[row][col]);
-		})
-	}
-
-	hadamard(otherMatr){
-		Matrix.checkIsMtr(otherMatr);
-		Matrix.checkEqualDims(this, otherMatr);
-		return Matrix.make(this.dims(), (row, col) => {
-			return this.mx[row][col] * otherMatr.mx[row][col];
-		});
-	}
-
-	reduce(fnc, start){
-		Matrix.checkIsFnc(fnc);
-		return new Matrix([[
-			flatMap(this.mx, util.ident).reduce( (total, element, rowIndex) => {
-				return fnc(total, element);
-			}, start)
-		]])
-	}
-
 	sub(otherMatr){
 		return this.add( otherMatr.piecewise( (x) => -x ) );
 	}
@@ -98,6 +65,38 @@ class Matrix {
 				otherMatr.col(col),
 				(m,n) => m * n));
 		});
+	}
+
+	hadamard(otherMatr){
+		Matrix.checkIsMtr(otherMatr);
+		Matrix.checkEqualDims(this, otherMatr);
+		return Matrix.make(this.dims(), (row, col) => {
+			return this.mx[row][col] * otherMatr.mx[row][col];
+		});
+	}
+
+	add_broadcast(otherMatr){
+		Matrix.checkIsMtr(otherMatr);
+		Matrix.isVector(otherMatr);
+		return Matrix.make( this.dims(), (row, col) => {
+			return this.mx[row][col] + otherMatr.mx[col][0]
+		});
+	}
+
+	piecewise(fnc){
+		Matrix.checkIsFnc(fnc);
+		return Matrix.make( this.dims(), (row, col) => {
+			return fnc(this.mx[row][col]);
+		})
+	}
+
+	reduce(fnc, start){
+		Matrix.checkIsFnc(fnc);
+		return new Matrix([[
+			flatMap(this.mx, util.ident).reduce( (total, element, rowIndex) => {
+				return fnc(total, element);
+			}, start)
+		]])
 	}
 
 	static make(dimensions, generator){

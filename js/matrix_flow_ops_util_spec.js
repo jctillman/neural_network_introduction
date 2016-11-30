@@ -23,7 +23,7 @@ describe('Has a utility library for ops', function(){
 
 		var Xval = new Matrix([1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0]);
 		var Yval = new Matrix([2.1, 2.9, 4.0, 5.5, 5.5, 7.0, 8.2]);
-		results = mdl.run([out],[X,Y],[Xval, Yval]);
+		var va = mdl.run([out],[X,Y],[Xval, Yval]);
 	});
 
 
@@ -35,8 +35,8 @@ describe('Has a utility library for ops', function(){
 		var inputMatrix = new Matrix([[1,0],[0,1],[0,0]]);
 		var X2 = o.Given([3,2]);
 		var out = o.Mult(X1, X2);
-		var [outputMatrix] = mdl.run([out],[X2],[inputMatrix])
-		expect(outputMatrix.mx).to.deep.equal([[1,3],[1,2]])
+		var va = mdl.run([out],[X2],[inputMatrix])
+		expect(va(out).mx).to.deep.equal([[1,3],[1,2]])
 	});
 
 

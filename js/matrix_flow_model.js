@@ -16,6 +16,12 @@ class Model{
 		this.parentChild = parentChild;
 	}
 
+	getOperationStore(){ return this.opStore; }
+
+	getRecentValueAcc(){ return this.valueAccs[this.valueAccs.length-1]; }
+
+	getParentChild(){ return this.parentChild; }
+
 	add(opsInstance){
 			
 		//Should only be adding instance of "operation"
@@ -53,43 +59,6 @@ class Model{
 		idsToGet.forEach(valueAcc);
 		this.valueAccs.push(valueAcc)
 		return valueAcc
-	}
-
-	getAllParamGradients(minId){
-
-		const valueAcc = this.valueAccs[this.valueAccs.length-1];
-
-		var idToMtr = { [minId]: valueAcc(minId).toOne() }
-
-		const derivAcc = (id) => {
-			if (idToMtr[id] !== undefined){
-				return idToMtr[id];
-			}else{
-				return idToMtr[id] = this.parentChild[id].reduce( (start, childId) => {
-					const op = this.opStore[childId]
-					const derivMtx = op.deriveWRT(childId, valueAcc, id, derivAcc)
-					return start.add(derivMtx);
-				}, valueAcc(id).toZero());
-			}
-		}
-
-		Object.keys(this.opStore).forEach(derivAcc);
-	
-		return Object.keys(idToMtr).reduce((obj, x) => {
-			return (this.opStore[x].type == 'Param') ?
-				apro(obj,x,idToMtr[x].copy()) : obj;
-		},{});
-
-	}
-
-	newAltered(paramChanges){
-		const valueAcc = this.valueAccs[this.valueAccs.length-1];
-		var altered = util.objMap(this.opStore, (op, key) => {
-			return (paramChanges[key]) ?
-				op.copy(valueAcc(key).add(paramChanges[key])) :
-				op;
-		});
-		return new Model(altered, this.valueAccs, this.parentChild)
 	}
 
 	_addParents(opId, parents){

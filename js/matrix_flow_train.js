@@ -1,10 +1,59 @@
 const Model = require('./matrix_flow_model.js');
 const la = require('./line_alge.js');
 const util = require('./util.js');
+const apro = util.addPropReturnObj;
 const MtrCol = la.MtrCol;
 const err = util.err;
 
-class AbstractOptimizer {}
+class AbstractOptimizer {
+
+	constructor(){
+
+	}
+
+	getAllParamGradients(mdl, minId, idValueMap){
+
+		var res = mdl.run([minId],idValueMap);
+
+		const valueAcc = mdl.getRecentValueAcc();
+		const operationStore = mdl.getOperationStore();
+		const parentChild = mdl.getParentChild();
+
+		var idToMtr = { [minId]: valueAcc(minId).toOne() }
+
+		const derivAcc = (id) => {
+			if (idToMtr[id] !== undefined){
+				return idToMtr[id];
+			}else{
+				return idToMtr[id] = parentChild[id].reduce( (start, childId) => {
+					const op = operationStore[childId]
+					const derivMtx = op.deriveWRT(childId, valueAcc, id, derivAcc)
+					return start.add(derivMtx);
+				}, valueAcc(id).toZero());
+			}
+		}
+
+		Object.keys(operationStore).forEach(derivAcc);
+	
+		return new MtrCol(Object.keys(idToMtr).reduce((obj, x) => {
+			return (operationStore[x].type == 'Param') ?
+				apro(obj,x,idToMtr[x].copy()) : obj;
+		},{}));
+
+	}
+
+	newAltered(mdl, paramChanges){
+		const opStore = mdl.getOperationStore();
+		const valueAcc = mdl.getRecentValueAcc();
+		var altered = util.objMap(opStore, (op, key) => {
+			return (paramChanges[key]) ?
+				op.copy(valueAcc(key).add(paramChanges[key])) :
+				op;
+		});
+		return new Model(altered, [valueAcc], mdl.getParentChild() );
+	}
+
+}
 
 class MomentumGradientDescent extends AbstractOptimizer {
 
@@ -17,8 +66,8 @@ class MomentumGradientDescent extends AbstractOptimizer {
 
 	run(model, minId, idValueMap){
 
-		var res = model.run([minId],idValueMap);
-		var gradient = new MtrCol(model.getAllParamGradients(minId));
+		var gradient = this.getAllParamGradients(model, minId, idValueMap);
+
 		var changedGradients = gradient.piecewise( x => -x * this.lr);
 
 		this.direction = (this.direction == undefined) ? 
@@ -27,7 +76,7 @@ class MomentumGradientDescent extends AbstractOptimizer {
 
 		this.direction = this.direction.add(changedGradients)
 
-		return model.newAltered(this.direction.extr());
+		return this.newAltered(model, this.direction.extr());
 	}
 
 }
@@ -53,8 +102,7 @@ class RMSProp extends AbstractOptimizer {
 
 	run(model, minId, idValueMap){
 
-		var res = model.run([minId],idValueMap);
-		var gradient = new MtrCol(model.getAllParamGradients(minId));
+		var gradient = this.getAllParamGradients(model, minId, idValueMap);
 
 		this.previousSquared = (this.previousSquared !== undefined) ?
 			this.previousSquared.add(gradient.pow(2)).piecewise(x => x * this.decay) : 
@@ -66,7 +114,7 @@ class RMSProp extends AbstractOptimizer {
 
 		var alterAmount = gradient.piecewise(x => -x * this.lr).hadamard(sqrtPrevReciprocal)
 
-		return model.newAltered(alterAmount.extr());
+		return this.newAltered(model, alterAmount.extr());
 	}
 }
 

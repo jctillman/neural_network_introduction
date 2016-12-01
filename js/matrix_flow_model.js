@@ -9,18 +9,14 @@ class Model{
 	
 	// opStore - object mapping object id -> operation itself
 	// valueAccs - array of functions, each mapping object id -> matrix value
-	// parentChild - object mapping object id -> object id
-	constructor(opStore = [], valueAccs = [], parentChild = []){
+	constructor(opStore = [], valueAccs = []){
 		this.opStore = opStore;
 		this.valueAccs = valueAccs;
-		this.parentChild = parentChild;
 	}
 
 	getOperationStore(){ return this.opStore; }
 
 	getRecentValueAcc(){ return this.valueAccs[this.valueAccs.length-1]; }
-
-	getParentChild(){ return this.parentChild; }
 
 	add(opsInstance){
 			
@@ -33,7 +29,6 @@ class Model{
 		//add to the parent-child map, and return the id.
 		const opId = util.newId();
 		this.opStore[opId] = opsInstance;
-		this._addParents(opId, opsInstance.getParents())
 		return opId;
 	}
 
@@ -59,15 +54,6 @@ class Model{
 		idsToGet.forEach(valueAcc);
 		this.valueAccs.push(valueAcc)
 		return valueAcc
-	}
-
-	_addParents(opId, parents){
-		parents.forEach( (parent) => {
-			this.parentChild[parent] =
-				(this.parentChild[parent] === undefined) ?
-					this.parentChild[parent] = [opId] :
-					this.parentChild[parent].concat(opId);
-		});
 	}
 
 }

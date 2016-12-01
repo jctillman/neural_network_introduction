@@ -9,18 +9,6 @@ class AbstractGradientOptimizer {
 
 	constructor(){}
 
-	_getParentChildMap(operationStore){
-		var parentChildMap = {};
-		Object.keys(operationStore).forEach( (opId) => {
-			operationStore[opId].getParents().forEach( (parent) => {
-				parentChildMap[parent] =
-					(parentChildMap[parent] === undefined) ?
-						[opId] : parentChildMap[parent].concat(opId);
-			});
-		});
-		return parentChildMap
-	}
-
 	run(model, minId, idValueMap){
 
 		const valueAcc = model.run([minId],idValueMap);
@@ -43,10 +31,13 @@ class AbstractGradientOptimizer {
 
 		Object.keys(operationStore).forEach(derivAcc);
 	
-		var gradient = Object.keys(idToMtr).reduce((obj, x) => {
-			return (operationStore[x].type == 'Param') ?
-				apro(obj,x,idToMtr[x].copy()) : obj;
-		},{});
+		var gradient = {}
+
+		Object.keys(idToMtr)
+			.filter( x => (operationStore[x].type == 'Param'))
+			.forEach( x => {
+				gradient[x] = derivAcc(x);
+			});
 
 		var alteration = this.getAlteration(new MtrCol(gradient)).extr();
 
@@ -57,6 +48,18 @@ class AbstractGradientOptimizer {
 		});
 		return new Model(altered, [valueAcc], parentChild );
 
+	}
+
+	_getParentChildMap(operationStore){
+		var parentChildMap = {};
+		Object.keys(operationStore).forEach( (opId) => {
+			operationStore[opId].getParents().forEach( (parent) => {
+				parentChildMap[parent] =
+					(parentChildMap[parent] === undefined) ?
+						[opId] : parentChildMap[parent].concat(opId);
+			});
+		});
+		return parentChildMap
 	}
 
 }

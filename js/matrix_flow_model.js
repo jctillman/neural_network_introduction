@@ -9,7 +9,7 @@ class Model{
 	
 	// opStore - object mapping object id -> operation itself
 	// valueAccs - array of functions, each mapping object id -> matrix value
-	constructor(opStore = [], valueAccs = []){
+	constructor(opStore = {}, valueAccs = []){
 		this.opStore = opStore;
 		this.valueAccs = valueAccs;
 	}
@@ -28,7 +28,7 @@ class Model{
 		//Generate a new id, assign the operation to it,
 		//add to the parent-child map, and return the id.
 		const opId = util.newId();
-		this.opStore[opId] = opsInstance;
+		this.opStore[opId] = opsInstance; 
 		return opId;
 	}
 
@@ -47,10 +47,8 @@ class Model{
 			}
 		}
 
-		// This creates a working valueAcc for idsToGet
-		// and for everything upstream of idsToGet, 
-		// stores the thus populated value accessor,
-		// and returns it.
+		// This valueAcc for idsToGet and all upstream,
+		// stores it, and returns it.
 		idsToGet.forEach(valueAcc);
 		this.valueAccs.push(valueAcc)
 		return valueAcc

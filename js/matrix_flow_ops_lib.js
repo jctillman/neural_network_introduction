@@ -103,7 +103,6 @@ const ReduceSum = (a) => {
 	)
 }
 
-
 module.exports = {
 	Param,
 	Given,

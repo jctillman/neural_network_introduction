@@ -7,9 +7,7 @@ const err = util.err;
 
 class AbstractOptimizer {
 
-	constructor(){
-
-	}
+	constructor(){}
 
 	getAllParamGradients(mdl, minId, idValueMap){
 
@@ -53,6 +51,12 @@ class AbstractOptimizer {
 		return new Model(altered, [valueAcc], mdl.getParentChild() );
 	}
 
+	run(model, minId, idValueMap){
+		var gradient = this.getAllParamGradients(model, minId, idValueMap);
+		var alteration = this.getAlteration(gradient);
+		return this.newAltered(model, alteration)
+	}
+
 }
 
 class MomentumGradientDescent extends AbstractOptimizer {
@@ -64,9 +68,7 @@ class MomentumGradientDescent extends AbstractOptimizer {
 		this.direction = undefined;
 	}
 
-	run(model, minId, idValueMap){
-
-		var gradient = this.getAllParamGradients(model, minId, idValueMap);
+	getAlteration(gradient){
 
 		var changedGradients = gradient.piecewise( x => -x * this.lr);
 
@@ -76,7 +78,7 @@ class MomentumGradientDescent extends AbstractOptimizer {
 
 		this.direction = this.direction.add(changedGradients)
 
-		return this.newAltered(model, this.direction.extr());
+		return this.direction.extr();
 	}
 
 }
@@ -100,9 +102,7 @@ class RMSProp extends AbstractOptimizer {
 		this.previousSquared = undefined
 	}
 
-	run(model, minId, idValueMap){
-
-		var gradient = this.getAllParamGradients(model, minId, idValueMap);
+	getAlteration(gradient){
 
 		this.previousSquared = (this.previousSquared !== undefined) ?
 			this.previousSquared.add(gradient.pow(2)).piecewise(x => x * this.decay) : 
@@ -114,7 +114,7 @@ class RMSProp extends AbstractOptimizer {
 
 		var alterAmount = gradient.piecewise(x => -x * this.lr).hadamard(sqrtPrevReciprocal)
 
-		return this.newAltered(model, alterAmount.extr());
+		return alterAmount.extr();
 	}
 }
 

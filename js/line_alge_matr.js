@@ -90,6 +90,10 @@ class Matrix {
 		})
 	}
 
+	toZero(){ return this.piecewise( () => 0); }
+
+	toOne(){ return this.piecewise( () => 1); }
+
 	reduce(fnc, start){
 		Matrix.checkIsFnc(fnc);
 		return new Matrix([[

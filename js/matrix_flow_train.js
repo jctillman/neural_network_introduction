@@ -15,8 +15,9 @@ class MomentumGradientDescent extends AbstractOptimizer {
 		this.direction = undefined;
 	}
 
-	run(model, minId, givenIds, givenVals){
-		var res = model.run([minId],givenIds,givenVals);
+	run(model, minId, idValueMap){
+
+		var res = model.run([minId],idValueMap);
 		var gradient = new MtrCol(model.getAllParamGradients(minId));
 		var changedGradients = gradient.piecewise( x => -x * this.lr);
 
@@ -50,9 +51,9 @@ class RMSProp extends AbstractOptimizer {
 		this.previousSquared = undefined
 	}
 
-	run(model, minId, givenIds, givenVals){
+	run(model, minId, idValueMap){
 
-		var res = model.run([minId],givenIds,givenVals);
+		var res = model.run([minId],idValueMap);
 		var gradient = new MtrCol(model.getAllParamGradients(minId));
 
 		this.previousSquared = (this.previousSquared !== undefined) ?

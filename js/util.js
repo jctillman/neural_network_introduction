@@ -15,7 +15,6 @@ const randEl = (str) => {
 	return str[Math.floor(Math.random()*str.length)];
 }
 
-
 //PERTAINS TO NUMERIC STUFF **************************
 const returnOne = () => 1;
 
@@ -58,7 +57,7 @@ const numericNum = (num) => {
 }
 
 
-//PERTAINS TO UTILITY STUFF ************************
+//PERTAINS TO UTILITY FUNCTIONAL PROGRAMMING ************************
 const zipWith = (arrOne, arrTwo, func) => {
 	(arrOne.length == arrTwo.length) || err("Arrays must be of same length.");
 	return numericArray(arrOne.map(function(_, i){

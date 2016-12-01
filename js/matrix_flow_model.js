@@ -7,47 +7,13 @@ const apro = util.addPropReturnObj;
 // Model is a computational graph
 class Model{
 	
-
 	// opStore - object mapping object id -> operation itself
 	// valueAccs - array of functions, each mapping object id -> matrix value
-	// parentChildMap - object mapping object id -> object id
-	constructor(opStore = [], valueAccs = [], parentChildMap = []){
+	// parentChild - object mapping object id -> object id
+	constructor(opStore = [], valueAccs = [], parentChild = []){
 		this.opStore = opStore;
 		this.valueAccs = valueAccs;
-		this.parentChildMap = parentChildMap;
-	}
-
-
-	run(idsToGet, paramIds, paramValues){
-
-		//Take the two arrays of paramIds and turn it
-		//into an object mapping from paramIds to paramValues.
-		//This is object immutable because it is inside the closure
-		//for the return value, nicely enough.
-		var idValueMap = paramIds.reduce(function(obj,_,i){
-			return apro(obj,paramIds[i],paramValues[i]);
-		},{});
-
-		//Accessor function passed into get value, which
-		//itself either returns a cached value or 
-		//calls getValue on the relevant Op.
-		const valueAcc = (someId) => {
-			if (idValueMap[someId] !== undefined){
-				return idValueMap[someId];
-			}else{
-				const tmp = this.opStore[someId].getValue(someId, valueAcc);
-				return idValueMap[someId] = tmp;
-			}
-		}
-
-		//This creates a working valueAcc for idsToGet
-		//and for everything upstream of idsToGet.
-		idsToGet.forEach(valueAcc);
-
-		//Store the thus populated value accessor,
-		//and then return it.
-		this.valueAccs.push(valueAcc)
-		return valueAcc
+		this.parentChild = parentChild;
 	}
 
 	add(opsInstance){
@@ -61,45 +27,57 @@ class Model{
 		//add to the parent-child map, and return the id.
 		const opId = util.newId();
 		this.opStore[opId] = opsInstance;
-		this.addParents(opId, opsInstance.getParents())
+		this._addParents(opId, opsInstance.getParents())
 		return opId;
 	}
 
-	addParents(opId, parents){
-		parents.forEach( (parent) => {
-			this.parentChildMap[parent] =
-				(this.parentChildMap[parent] === undefined) ?
-					this.parentChildMap[parent] = [opId] :
-					this.parentChildMap[parent].concat(opId);
-		});
+	run(idsToGet, idToMtr){
+
+		// Accessor function passed into get value, which
+		// itself either returns a cached value or 
+		// calls getValue on the relevant Op.
+		const ops = this.opStore;
+		const valueAcc = (id) => {
+			if (idToMtr[id] !== undefined){
+				return idToMtr[id];
+			}else{
+				const tmp = ops[id].getValue(id, valueAcc);
+				return idToMtr[id] = tmp;
+			}
+		}
+
+		// This creates a working valueAcc for idsToGet
+		// and for everything upstream of idsToGet, 
+		// stores the thus populated value accessor,
+		// and returns it.
+		idsToGet.forEach(valueAcc);
+		this.valueAccs.push(valueAcc)
+		return valueAcc
 	}
 
 	getAllParamGradients(minId){
 
 		const valueAcc = this.valueAccs[this.valueAccs.length-1];
 
-		var idDerivMap = {}
-		idDerivMap[minId] = valueAcc(minId).piecewise( () => 1);
+		var idToMtr = { [minId]: valueAcc(minId).toOne() }
 
-		const derivAcc = (someId) => {
-			if (idDerivMap[someId] !== undefined){
-				return idDerivMap[someId];
+		const derivAcc = (id) => {
+			if (idToMtr[id] !== undefined){
+				return idToMtr[id];
 			}else{
-				idDerivMap[someId] = this.parentChildMap[someId].reduce( (start, elId) => {
-					const op = this.opStore[elId]
-					const derivMtx = op.deriveWRT(elId, valueAcc, someId, derivAcc)
+				return idToMtr[id] = this.parentChild[id].reduce( (start, childId) => {
+					const op = this.opStore[childId]
+					const derivMtx = op.deriveWRT(childId, valueAcc, id, derivAcc)
 					return start.add(derivMtx);
-				}, valueAcc(someId).piecewise(() => 0) );
-				return idDerivMap[someId];
+				}, valueAcc(id).toZero());
 			}
 		}
 
 		Object.keys(this.opStore).forEach(derivAcc);
 	
-		return Object.keys(idDerivMap).reduce((obj, x) => {
+		return Object.keys(idToMtr).reduce((obj, x) => {
 			return (this.opStore[x].type == 'Param') ?
-				apro(obj,x,idDerivMap[x].copy()) : 
-				obj;
+				apro(obj,x,idToMtr[x].copy()) : obj;
 		},{});
 
 	}
@@ -111,7 +89,16 @@ class Model{
 				op.copy(valueAcc(key).add(paramChanges[key])) :
 				op;
 		});
-		return new Model(altered, this.valueAccs, this.parentChildMap)
+		return new Model(altered, this.valueAccs, this.parentChild)
+	}
+
+	_addParents(opId, parents){
+		parents.forEach( (parent) => {
+			this.parentChild[parent] =
+				(this.parentChild[parent] === undefined) ?
+					this.parentChild[parent] = [opId] :
+					this.parentChild[parent].concat(opId);
+		});
 	}
 
 }

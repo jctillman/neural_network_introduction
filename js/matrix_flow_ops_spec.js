@@ -26,9 +26,9 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 				var goal = o.Pow(o.Sub(inter, g),2)
 				
 				for(var x = 0; x < 50; x++)
-					mdl = tr.run(mdl, goal,[g],[goalMatrix])
+					mdl = tr.run(mdl, goal,{[g]: goalMatrix})
 
-				var va = mdl.run([fst, snd],[],[]);
+				var va = mdl.run([fst, snd],{});
 				var diff = va(fst).add(va(snd));
 				expect(diff.equalish(goalMatrix,0.1)).to.equal(true)
 			});
@@ -46,9 +46,9 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 				var goal = o.Pow(m,2);
 
 				for(var x = 0; x < 50; x++)
-					mdl = tr.run(mdl, goal,[g],[goalMatrix])
+					mdl = tr.run(mdl, goal,{[g]: goalMatrix })
 
-				var va = mdl.run([fst],[],[]);
+				var va = mdl.run([fst],{});
 				expect(va(fst).equalish(goalMatrix,0.1)).to.equal(true);
 
 			});
@@ -67,9 +67,9 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 				var goal = o.Pow(o.Sub(g, inter),2)
 				
 				for(var x = 0; x < 100; x++)
-					mdl = tr.run(mdl, goal,[g],[goalMatrix])
+					mdl = tr.run(mdl, goal,{[g]: goalMatrix})
 
-				var va = mdl.run([fst, snd],[],[]);
+				var va = mdl.run([fst, snd],{});
 				var diff = va(fst).mult(va(snd));
 
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
@@ -89,9 +89,9 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 				var goal = o.Pow(o.Sub(g, inter),2)
 				
 				for(var x = 0; x < 100; x++)
-					mdl = tr.run(mdl, goal,[g],[goalMatrix])
+					mdl = tr.run(mdl, goal,{[g]:goalMatrix})
 
-				var va = mdl.run([fst, snd],[],[]);
+				var va = mdl.run([fst, snd],{});
 				var diff = va(fst).add_broadcast(va(snd));
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
 			});
@@ -109,9 +109,9 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 				var goal = o.Pow(o.Sub(g, inter),2)
 				
 				for(var x = 0; x < 50; x++)
-					mdl = tr.run(mdl, goal,[g],[goalMatrix])
+					mdl = tr.run(mdl, goal,{[g]: goalMatrix })
 
-				var va = mdl.run([fst],[],[]);
+				var va = mdl.run([fst],{});
 				var diff = va(fst).reduce( (x,y) => x + y, 0);
 
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)

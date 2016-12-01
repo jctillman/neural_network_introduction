@@ -13,7 +13,7 @@ describe('Can make and get basic output from models', function(){
 		var mdl = new mf.Model();
 		var inputMatrix = new Matrix([[1,3,2],[1,2,3]]);
 		var X = mdl.add(o.Param(inputMatrix));
-		var va = mdl.run([X],[],[])
+		var va = mdl.run([X],{})
 		expect(inputMatrix.mx).to.deep.equal(va(X).mx);
 	});
 
@@ -22,7 +22,7 @@ describe('Can make and get basic output from models', function(){
 		var mdl = new mf.Model();
 		var X = mdl.add(o.Given());
 		var givenMatrix = new Matrix([[1,3,2],[1,2,3]]);
-		var va = mdl.run([X],[X],[givenMatrix])
+		var va = mdl.run([X],{[X]: givenMatrix })
 		expect(givenMatrix.mx).to.deep.equal(va(X).mx);
 	});
 
@@ -33,7 +33,7 @@ describe('Can make and get basic output from models', function(){
 		var param1 = mdl.add(o.Param(param1Matrix))
 		var param2 = mdl.add(o.Param(param2Matrix))
 		var out = mdl.add(o.Add(param1, param2));
-		var va = mdl.run([out],[],[])
+		var va = mdl.run([out],{})
 		expect(va(out).mx).to.deep.equal([[2,3,3],[1,3,4]])
 	});
 
@@ -44,7 +44,7 @@ describe('Can make and get basic output from models', function(){
 		var inputMatrix = new Matrix([[1,0],[0,1],[0,0]]);
 		var X2 = mdl.add(o.Given([3,2]));
 		var out = mdl.add(o.Mult(X1, X2));
-		var va = mdl.run([out],[X2],[inputMatrix])
+		var va = mdl.run([out],{[X2]: inputMatrix})
 		expect(va(out).mx).to.deep.equal([[1,3],[1,2]])
 	});
 
@@ -54,7 +54,7 @@ describe('Can make and get basic output from models', function(){
 		var X = om.Given();
 		var reduced = om.ReduceSum(X);
 		var inp = new Matrix([1,2,3,4,5,6]);
-		var va = mdl.run([reduced],[X],[inp]);
+		var va = mdl.run([reduced],{[X] :inp});
 		expect(va(reduced).mx[0][0]).to.equal(21)
 	})
 
@@ -69,7 +69,7 @@ describe('Can make and get basic output from models', function(){
 		var Xval = new Matrix([[1.0,1.0], [2.0,2.0], [3.0,3.0]]);
 		var Yval = new Matrix([[2.0],[1.0]]);
 
-		var va = mdl.run([abd],[X,Y],[Xval,Yval]);
+		var va = mdl.run([abd],{[X]: Xval, [Y]: Yval });
 		expect(va(abd).mx).to.deep.equal([[3.0,2.0], [4.0,3.0], [5.0,4.0]])
 	})
 

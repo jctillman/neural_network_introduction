@@ -11,9 +11,14 @@ class AbstractGradientOptimizer {
 
 	run(model, minId, idValueMap){
 
+		
+
 		const valueAcc = model.run([minId],idValueMap);
 		const operationStore = model.getOperationStore();
 		const parentChild = this._getParentChildMap(operationStore);
+
+		const paramInOperation = (x) => operationStore[x].type == 'Param';
+		const paramIds = Object.keys(operationStore).filter(paramInOperation)
 
 		var idToMtr = { [minId]: valueAcc(minId).toOne() }
 
@@ -29,15 +34,13 @@ class AbstractGradientOptimizer {
 			}
 		}
 
-		Object.keys(operationStore).forEach(derivAcc);
+		paramIds.forEach(derivAcc);
 	
 		var gradient = {}
 
-		Object.keys(idToMtr)
-			.filter( x => (operationStore[x].type == 'Param'))
-			.forEach( x => {
-				gradient[x] = derivAcc(x);
-			});
+		paramIds.forEach( x => {
+			gradient[x] = derivAcc(x);
+		});
 
 		var alteration = this.getAlteration(new MtrCol(gradient)).extr();
 

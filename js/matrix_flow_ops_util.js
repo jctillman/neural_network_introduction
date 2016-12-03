@@ -15,6 +15,5 @@ const ObjOpWrapper = (paramObj, mdl) => {
 
 
 module.exports = {
-	ObjOpWrapper,
-	OpWrapper
+	ObjOpWrapper
 }

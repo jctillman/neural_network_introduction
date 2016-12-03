@@ -25,7 +25,7 @@ class AbstractGradientOptimizer {
 		//   dependent children ids.
 		//4. paramIds, which is an array of all the ids 
 		//   that can be altered by the gradient
-		const valueAcc = model.run([minId],idValueMap);
+		const valueAcc = model.run(idValueMap);
 		const opStore = model.getOperationStore();
 		const parentChild = this._getParentChildMap(opStore);
 		const paramInOperation = (x) => opStore[x].type == 'Param';

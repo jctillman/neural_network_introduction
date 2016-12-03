@@ -15,7 +15,7 @@ describe('Has a utility library for ops', function(){
 		var inputMatrix = new Matrix([[1,0],[0,1],[0,0]]);
 		var X2 = o.Given([3,2]);
 		var out = o.Mult(X1, X2);
-		var va = mdl.run([out],{[X2]: inputMatrix})
+		var va = mdl.run({[X2]: inputMatrix})
 		expect(va(out).mx).to.deep.equal([[1,3],[1,2]])
 	});
 

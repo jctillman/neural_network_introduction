@@ -5,9 +5,13 @@ const apro = util.addPropReturnObj;
 
 
 // Model is a computational graph
+// You add operations to it.
+// Then you give it an input,
+// it applies the operations,
+// and then you get an output.
 class Model{
 	
-	// opStore - object mapping object id -> operation itself
+	// opStore - object mapping object id -> an operation
 	// valueAccs - array of functions, each mapping object id -> matrix value
 	constructor(opStore = {}, valueAccs = []){
 		this.opStore = opStore;
@@ -18,6 +22,7 @@ class Model{
 
 	getRecentValueAcc(){ return this.valueAccs[this.valueAccs.length-1]; }
 
+	// opsInstance - an instance of the Operation class
 	add(opsInstance){
 			
 		//Should only be adding instance of "operation"
@@ -32,7 +37,7 @@ class Model{
 		return opId;
 	}
 
-	run(idsToGet, idToMtr){
+	run(idToMtr){
 
 		// Accessor function passed into get value, which
 		// itself either returns a cached value or 
@@ -49,7 +54,7 @@ class Model{
 
 		// This valueAcc for idsToGet and all upstream,
 		// stores it, and returns it.
-		idsToGet.forEach(valueAcc);
+		Object.keys(idToMtr).forEach(valueAcc);
 		this.valueAccs.push(valueAcc)
 		return valueAcc
 	}

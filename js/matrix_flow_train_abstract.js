@@ -90,6 +90,10 @@ class AbstractGradientOptimizer {
 		return parentChildMap
 	}
 
+	getAlteration(){
+		err("getAlteration must be overridden by a child class");
+	}
+
 }
 
 module.exports = {

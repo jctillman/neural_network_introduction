@@ -1,28 +1,30 @@
 const util = require('./util.js');
 const Matrix = require('./line_alge.js').Matrix;
 const Operation = require('./matrix_flow_ops_operation.js');
-const apro = util.addPropReturnObj;
 
 
 // Model is a computational graph
 // You add operations to it.
-// Then you give it an input,
-// it applies the operations,
-// and then you get an output.
+// Then you give it an input, and
+// it applies the operations, and
+// then you get an accessor for the output.
 class Model{
 	
-	// opStore - object mapping object id -> an operation
-	// valueAccs - array of functions, each mapping object id -> matrix value
+	// opStore - an object, mapping operation id -> an instance of Operation
+	// valueAccs - an array of functions, each mapping operation id -> matrix value
 	constructor(opStore = {}, valueAccs = []){
 		this.opStore = opStore;
 		this.valueAccs = valueAccs;
 	}
 
+	// @returns -- object mapping from operation id to operation
 	getOperationStore(){ return this.opStore; }
 
+	// @returns -- function taking operation id, and giving a matrix object
 	getRecentValueAcc(){ return this.valueAccs[this.valueAccs.length-1]; }
 
 	// opsInstance - an instance of the Operation class
+	// @returns -- the operation id for the op in this.opStore
 	add(opsInstance){
 			
 		//Should only be adding instance of "operation"
@@ -37,6 +39,10 @@ class Model{
 		return opId;
 	}
 
+	// idToMtr -- an object mapping from operation id to a matrix value
+	//				for that operation
+	// @returns -- a function which, given an operation id, returns
+	//				the matrix value for that operation.
 	run(idToMtr){
 
 		// Accessor function passed into get value, which

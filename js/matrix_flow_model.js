@@ -3,16 +3,16 @@ const Matrix = require('./line_alge.js').Matrix;
 const Operation = require('./matrix_flow_ops_operation.js');
 
 
-// Model is a computational graph
-// You add operations to it.
-// Then you give it an input, and
+// Model is a computational graph.
+// You add operations to it, and
+// then give it an input, and
 // it applies the operations, and
 // then you get an accessor for the output.
 class Model{
 	
-	// opStore - an object, mapping operation id -> an instance of Operation
-	// valueAccs - an array of functions, each mapping operation id -> matrix value
 	constructor(opStore = {}, valueAccs = []){
+	// opStore - an object, mapping "operation id" -> an instance of Operation
+	// valueAccs - an array of functions, each mapping "operation id" -> instance of Matrix
 		this.opStore = opStore;
 		this.valueAccs = valueAccs;
 	}

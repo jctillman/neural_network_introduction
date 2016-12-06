@@ -15,6 +15,14 @@ const randEl = (str) => {
 	return str[Math.floor(Math.random()*str.length)];
 }
 
+const shuffle = (arr) => {
+	var ret = []
+	while(arr.length){
+		ret.push(arr.splice(Math.floor(Math.random()*arr.length),1)[0]);
+	}
+	return ret;
+}
+
 //PERTAINS TO NUMERIC STUFF **************************
 const returnOne = () => 1;
 

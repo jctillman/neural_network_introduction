@@ -1,4 +1,7 @@
-var fs = require('fs');
+const fs = require('fs');
+const la = require('./line_alge.js');
+const Matrix = la.Matrix;
+const util = require('./util.js');
 
 const loc = './small_mnist.json'
 
@@ -7,20 +10,30 @@ module.exports = {
 	allElements: function(){
 		return JSON.parse(fs.readFileSync(loc).toString());},
 
-	zeroAndOne: function(){
-		return JSON.parse(fs.readFileSync(loc).toString())
-					.filter(function(n){ return n[1][1] == 1 || n[1][0] == 1 } );},
+	batchMakers: function(trainingSize){
 
-	fiveAndNine: function(){
-		return JSON.parse(fs.readFileSync(loc).toString())
-					.filter(function(n){ return n[1][5] == 1 || n[1][9] == 1} );},
+		const shuf = util.shuffle;
+		const makerFunctionMaker = (start,stop) => {
+			const num = stop - start;
+			var els = shuf(this.allElements().slice(start, stop));
+			var index = 0;
+			return (batch) => {
+				if (index + batchSize > num){
+					els = shuf(this.allElements().slice(start, stop));
+					index = 0;
+				}
+				var limitedEls = els.slice(index,index+batch);
+				return [
+					new Matrix(limitedEls.reduce(util.pluck(0))),
+					new Matrix(limitedEls.reduce(util.pluck(1)))
+				]
+			}
+		}
 
-	fourAndSixAndEight: function(){
-		return JSON.parse(fs.readFileSync(loc).toString())
-					.filter(function(n){ return n[1][4] == 1 || n[1][6] == 1 || n[1][8] == 1} );},
-
-	zeroAndOneAndFive: function(){
-		return JSON.parse(fs.readFileSync(loc).toString())
-					.filter(function(n){ return n[1][0] == 1 || n[1][1] == 1 || n[1][5] == 1} );}
+		return [
+			makerFunctionMaker(0,trainingSize),
+			makerFunctionMaker(trainingSize,10000)
+		]
+	}
 
 }

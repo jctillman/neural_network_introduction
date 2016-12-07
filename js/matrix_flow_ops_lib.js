@@ -89,6 +89,18 @@ const Pow = (a,powr) => {
 	)
 }
 
+const Sigmoid = (a) => {
+	const sigmoid = (x) => 1.0 / (1.0 + Math.exp(-x));
+	const d = (x) => x * (1 - x);
+	return new Operation(
+		'Pow', [a], () => Pow(a,powr),
+		(elId, valueAcc) => valueAcc(a).piecewise(sigmoid),
+		(elId, valueAcc, wrt, derivAcc) => {
+			return valueAcc(elId).piecewise(d).hadamard(derivAcc(elId));
+		}
+	)
+}
+
 
 const ReduceSum = (a) => {
 	return new Operation(

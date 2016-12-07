@@ -93,13 +93,17 @@ const addPropReturnObj = (obj, prop, val) => {
 
 const ident = (x) => x;
 
+const pluck = (x) => {
+	return (y) => y[x]
+}
+
 
 //ACTUAL EXPORTS *******************************
 module.exports = {
-	newId: newId(),
+	newId: newId(), shuffle,
 	returnOne, returnNegOne, normal, sum,
 	numericNum, numericArray, err,
-	flatMap, zipWith, objMap, ident, addPropReturnObj	
+	flatMap, zipWith, objMap, ident, pluck, addPropReturnObj	
 }
 
 

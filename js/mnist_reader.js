@@ -10,29 +10,35 @@ module.exports = {
 	allElements: function(){
 		return JSON.parse(fs.readFileSync(loc).toString());},
 
-	batchMakers: function(trainingSize){
+	batchMakers: function(trainingProportion){
 
+		const tp = trainingProportion;
 		const shuf = util.shuffle;
-		const makerFunctionMaker = (start,stop) => {
-			const num = stop - start;
-			var els = shuf(this.allElements().slice(start, stop));
+		const all = this.allElements();
+		const elNum = all.length;
+		const trainingEls = all.slice(0, elNum*tp);
+		const testingEls = all.slice(elNum*tp,elNum);
+
+		const makerFunctionMaker = (subsect) => {
+			const subsectNum = subsect.length;
+			var els = shuf(subsect);
 			var index = 0;
-			return (batch) => {
-				if (index + batchSize > num){
-					els = shuf(this.allElements().slice(start, stop));
+			return (batchSize) => {
+				if (index + batchSize > subsectNum){
+					els = shuf(subsect);
 					index = 0;
 				}
-				var limitedEls = els.slice(index,index+batch);
+				var limEl = els.slice(index,index+batchSize);
 				return [
-					new Matrix(limitedEls.reduce(util.pluck(0))),
-					new Matrix(limitedEls.reduce(util.pluck(1)))
+					new Matrix(limEl.map(util.pluck(0))),
+					new Matrix(limEl.map(util.pluck(1)))
 				]
 			}
 		}
 
 		return [
-			makerFunctionMaker(0,trainingSize),
-			makerFunctionMaker(trainingSize,10000)
+			makerFunctionMaker(trainingEls),
+			makerFunctionMaker(testingEls)
 		]
 	}
 

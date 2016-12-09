@@ -123,5 +123,6 @@ module.exports = {
 	Mult,
 	AddBroadcast,
 	Pow,
-	ReduceSum
+	ReduceSum,
+	Sigmoid
 }

@@ -85,14 +85,14 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 				var snd = o.Param(new Matrix([1,1,1]));
 				var g = o.Given()
 
-				var inter = o.AddBroadcast(fst,snd);
+				var inter = o.AddBroadcastCols(fst,snd);
 				var goal = o.Pow(o.Sub(g, inter),2)
 				
 				for(var x = 0; x < 100; x++)
 					mdl = tr.run(mdl, goal,{[g]:goalMatrix})
 
 				var va = mdl.run([fst, snd],{});
-				var diff = va(fst).add_broadcast(va(snd));
+				var diff = va(fst).add_broadcast_cols(va(snd));
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
 			});
 

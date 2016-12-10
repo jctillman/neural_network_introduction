@@ -61,17 +61,29 @@ const Mult = (a,b) => {
 }
 
 
-const AddBroadcast = (a,b) => {
+const AddBroadcastCols = (a,b) => {
 	return new Operation(
-		'AddBroadcast', [a,b], () => AddBroadcast(a,b),
-		(elId, valueAcc) => valueAcc(a).add_broadcast(valueAcc(b)),
+		'AddBroadcastCols', [a,b], () => AddBroadcastCols(a,b),
+		(elId, valueAcc) => valueAcc(a).add_broadcast_cols(valueAcc(b)),
+		(elId, valueAcc, wrt, derivAcc) => {
+			const d = derivAcc(elId)
+			return (wrt == a) ? d : Matrix.make([d.mx.length,1], (row, col) => {
+					return util.sum(d.col(row));
+				});
+		}
+	)
+}
+
+const AddBroadcastRows = (a,b) => {
+	return new Operation(
+		'AddBroadcastCols', [a,b], () => AddBroadcastRows(a,b),
+		(elId, valueAcc) => valueAcc(a).add_broadcast_rows(valueAcc(b)),
 		(elId, valueAcc, wrt, derivAcc) => {
 			const d = derivAcc(elId)
 			return (wrt == a) ? 
-				valueAcc(a).hadamard(d) :
-				Matrix.make([d.mx.length,1], (row, col) => {
-					return util.sum(d.mx[row]);
-				});
+				d : (Matrix.make([1,d.mx[0].length], (row, col) => {
+					return util.sum(d.col(row));
+				}));
 		}
 	)
 }
@@ -121,7 +133,8 @@ module.exports = {
 	Add,
 	Sub,
 	Mult,
-	AddBroadcast,
+	AddBroadcastCols,
+	AddBroadcastRows,
 	Pow,
 	ReduceSum,
 	Sigmoid

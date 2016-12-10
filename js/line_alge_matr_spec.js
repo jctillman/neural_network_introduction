@@ -37,7 +37,7 @@ describe('Possesses a matrix abstraction', function(){
 	});
 
 	it('Can add a matrix while broadcasting, i.e., a N x M and a M x 1 matrix', function(){
-		expect(fst.add_broadcast(new Matrix([1,1,1])).mx).to.deep.equal([[2,3,4],[4,3,2]]); 
+		expect(fst.add_broadcast_cols(new Matrix([1,1,1])).mx).to.deep.equal([[2,3,4],[4,3,2]]); 
 	});
 
 	it('Can multiply a matrix by another matrix', function(){

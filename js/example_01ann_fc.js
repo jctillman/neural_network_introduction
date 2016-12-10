@@ -5,7 +5,7 @@ const Matrix = require('./line_alge.js').Matrix
 
 describe("Can train a basic fully connected sigmoid network", function(){
 
-	xit('Can train a basic fc sigmoid classifier', function(){
+	it('Can train a basic fc sigmoid classifier', function(){
 
 		const [trainer, tester] = mnist.batchMakers(0.9);
 		const batchSize = 25;
@@ -16,14 +16,18 @@ describe("Can train a basic fully connected sigmoid network", function(){
 
 		const input = o.Given()
 		const output = o.Given()
+
 		const w1 = o.Param(Matrix.make([784,100],() => (Math.random()-0.5)/100.00 ))
-		const l1 = o.Sigmoid(o.Mult(input, w1))
-		const w2 = o.Param(Matrix.make([100,10],() => (Math.random()-0.5)/100.00 ))
-		const l2 = o.Sigmoid(o.Mult(l1, w2))
+		const b1 = o.Param(Matrix.make([1,  100], () => (Math.random()-0.5)/100.00 ))
+		const l1 = o.Sigmoid(o.AddBroadcastRows(o.Mult(input, w1),b1))
+
+		const w2 = o.Param(Matrix.make([100,10], () => (Math.random()-0.5)/100.00 ))
+		const b2 = o.Param(Matrix.make([1,  10], () => (Math.random()-0.5)/100.00 ))
+		const l2 = o.Sigmoid(o.AddBroadcastRows(o.Mult(l1, w2),b2))
 
 		const loss = o.ReduceSum(o.Pow(o.Sub(output,l2),2))
 
-		for(var i = 0; i < 20; i++){
+		for(var i = 0; i < 30; i++){
 
 			var [matIn, matOut] = trainer(batchSize);
 			var train = {[input]: matIn, [output]: matOut }

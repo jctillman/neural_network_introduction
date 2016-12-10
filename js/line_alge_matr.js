@@ -75,11 +75,19 @@ class Matrix {
 		});
 	}
 
-	add_broadcast(otherMatr){
+	add_broadcast_cols(otherMatr){
 		Matrix.checkIsMtr(otherMatr);
-		Matrix.isVector(otherMatr);
+		Matrix.isColumnVector(otherMatr);
 		return Matrix.make( this.dims(), (row, col) => {
 			return this.mx[row][col] + otherMatr.mx[col][0]
+		});
+	}
+
+	add_broadcast_rows(otherMatr){
+		Matrix.checkIsMtr(otherMatr);
+		Matrix.isRowVector(otherMatr);
+		return Matrix.make( this.dims(), (row, col) => {
+			return this.mx[row][col] + otherMatr.mx[0][col]
 		});
 	}
 
@@ -123,11 +131,16 @@ class Matrix {
 	static checkEqualDims(thisMtr, otherMatr){
 		(otherMatr.mx.length == thisMtr.mx.length) &&
 		(otherMatr.mx[0].length == thisMtr.mx[0].length) ||
-			err("Matrices must be of equal size.");}
-
-	static isVector(otherMatr){
+			err("Matrices must be of equal size.");
+	}
+			
+	static isColumnVector(otherMatr){
 		(otherMatr.mx[0].length == 1) ||
-			err("Matrix must be a vector, i.e., have only one column.");}
+			err("Matrix must be a column vector, i.e., have only one column.");}
+
+	static isRowVector(otherMatr){
+		(otherMatr.mx.length == 1) ||
+			err("Matrix must be a row vector, i.e., have only one row.");}
 
 	static checkMultDims(thisMtr, otherMatr){
 		(thisMtr.mx[0].length == otherMatr.mx.length) ||

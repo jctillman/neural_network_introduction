@@ -116,7 +116,43 @@ describe('Integration Testing: Cross product of operations and optimizers work',
 
 				expect(diff.equalish(goalMatrix,0.05)).to.equal(true)
 			});
-		})
+
+			it('Can create and train a model using Softmax', function(){
+
+				var tr = optimizer_maker(); 
+				var mdl = new mf.Model();
+				var o = mf.ops.util.ObjOpWrapper(mf.ops.lib, mdl);
+				var bias = o.Param(new Matrix([0.5,0.5]));
+				var inp = o.Given();
+				var out = o.Given();
+
+				var inter = o.Softmax(o.Add(bias,inp));
+				var goal = o.ReduceSum(o.Pow(o.Sub(inter, out),2));
+
+				for(var x = 0; x < 260; x++){
+					var inMatrix = new Matrix([
+							(Math.random()-0.5)*0.25,
+							(Math.random()-0.5)*0.25
+						]);
+					var outMatrix = new Matrix([1,0]);
+					mdl = tr.run(mdl, goal, {
+						[inp]: inMatrix,
+						[out]: outMatrix });
+				}
+
+				var va = mdl.run({
+						[inp]: new Matrix([
+							0.25*(Math.random()-0.5),
+							0.25*(Math.random()-0.5)
+							]),
+						[out]: outMatrix })
+
+				var goal = va(goal).mx[0][0];
+				expect(goal < 0.02).to.equal(true);			
+
+			});
+
+		});
 	}
 
 	var optimizers = [

@@ -7,8 +7,10 @@ const MtrCol = la.MtrCol;
 
 // An extension of the AbstractGradientOptimizer
 // can must include a "getAlteration" function,
-// which takes a MtrCol giving the gradient of 
-//  
+// which takes a MtrCol (matrix collection) 
+// giving the gradient of all the parameters
+// for the model, and returns the correct
+// deltas for the parameters for the model.
 class AbstractGradientOptimizer {
 
 	constructor(){}
@@ -46,9 +48,13 @@ class AbstractGradientOptimizer {
 			if (idToMtr[id] !== undefined){
 				return idToMtr[id];
 			}else{
+				if (!parentChild[id]){
+					//console.log(parentChild)
+					//console.log(id)
+				}
 				return idToMtr[id] = parentChild[id].reduce( (start, childId) => {
-					const op = opStore[childId]
-					const derivMtx = op.deriveWRT(childId, valueAcc, id, derivAcc)
+					const op = opStore[childId];
+					const derivMtx = op.deriveWRT(childId, valueAcc, id, derivAcc);
 					return start.add(derivMtx);
 				}, valueAcc(id).toZero());
 			}

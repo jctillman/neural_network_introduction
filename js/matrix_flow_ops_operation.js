@@ -6,11 +6,11 @@ class Operation{
 	constructor(type, parents, copy, getValue, deriveWRT){
 
 		//Go crazy with the type-checking, why not.
-		(Array.isArray(parents)) || err("'Parents' must be array.")
-		(typeof type == 'string') || err("'Type' must be string.")
-		(typeof copy == 'function') || err("'Type' must be function.")
-		(typeof getValue == 'function') || err("'getValue' must be function.")
-		(typeof deriveWRT == 'function') || err("'deriveWRT' must be function.")
+		(Array.isArray(parents)) || err("'Parents' must be array.");
+		(typeof type == 'string') || err("'Type' must be string.");
+		(typeof copy == 'function') || err("'Type' must be function.");
+		(typeof getValue == 'function') || err("'getValue' must be function.");
+		(typeof deriveWRT == 'function') || err("'deriveWRT' must be function.");
 
 		this.type = type;
 		this.getParents = () => parents;

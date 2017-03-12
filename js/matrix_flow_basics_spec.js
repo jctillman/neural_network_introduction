@@ -56,21 +56,36 @@ describe('Can make and get basic output from models', function(){
 		var inp = new Matrix([1,2,3,4,5,6]);
 		var va = mdl.run({[X] :inp});
 		expect(va(reduced).mx[0][0]).to.equal(21)
-	})
+	});
 
-	it ('Has a AddBroadcast that works', function(){
+	it ('Has a AddBroadcastCols that works', function(){
 		var mdl = new mf.Model();
 		var om = mf.ops.util.ObjOpWrapper(mf.ops.lib, mdl);
 
 		var X = om.Given();
 		var Y = om.Given()
-		var abd = om.AddBroadcast(X,Y)
+		var abd = om.AddBroadcastCols(X,Y)
 
 		var Xval = new Matrix([[1.0,1.0], [2.0,2.0], [3.0,3.0]]);
 		var Yval = new Matrix([[2.0],[1.0]]);
 
 		var va = mdl.run({[X]: Xval, [Y]: Yval });
 		expect(va(abd).mx).to.deep.equal([[3.0,2.0], [4.0,3.0], [5.0,4.0]])
-	})
+	});
+
+	it ('Has a AddBroadcastRows that works', function(){
+		var mdl = new mf.Model();
+		var om = mf.ops.util.ObjOpWrapper(mf.ops.lib, mdl);
+
+		var X = om.Given();
+		var Y = om.Given()
+		var abd = om.AddBroadcastRows(X,Y)
+
+		var Xval = new Matrix([[1.0,1.0], [2.0,2.0], [3.0,3.0]]);
+		var Yval = new Matrix([[2.0,1.0]]);
+
+		var va = mdl.run({[X]: Xval, [Y]: Yval });
+		expect(va(abd).mx).to.deep.equal([[3.0,2.0], [4.0,3.0], [5.0,4.0]])
+	});
 
 })
